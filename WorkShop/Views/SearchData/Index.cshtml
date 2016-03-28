@@ -8,54 +8,73 @@
 <html>
 
 <body>
-    <table border="1" style="width:100%" border-collapse="collapse">
-        <tr>
-            <th>訂單編號</th>
-            <td colspan="3"><input type="text" /></td>
-        </tr>
-        <tr>
-            <th>客戶名稱</th>
-            <td colspan="3"><input type="text" /></td>
-        </tr>
-        <tr>
-            <th>負責員工</th>
-            <td colspan="3">
-                <select name="employee">
-                    <option value="1">醜八怪豆子</option>
-                    <option value="2">黑嚕嚕軒含</option>
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <th>出貨公司</th>
-            <td colspan="3">
-                <select name="company">
-                    <option value="3">胖胖豬佳芸 股份有限公司</option>
-                    <option value="4">傻瓜呆子婷 股份有限公司</option>
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <th>訂購日期</th>
-            <td><input type="date" /></td>
+    @using (Html.BeginForm("Index", "SearchData", FormMethod.Post))
+    {
 
-            <th>出貨日期</th>
-            <td><input type="date" /></td>
+        <table border="1" style="width:100%" border-collapse="collapse">
+            <tr>
+                <th>訂單編號</th>
+                <td colspan="3"><input type="text" name="orderId"></td>
+            </tr>
+            <tr>
+                <th>客戶名稱</th>
+                <td colspan="3"><input type="text" name="custName" /></td>
+            </tr>
+            <tr>
+                <th>負責員工</th>
+                <td colspan="3">
+                    <select name="employee">
+                        <option value="00">請選擇負責員工</option>
+                        @if (ViewBag.emName != null)
+                        {
+                            foreach (var tmp in (List<String>)ViewBag.emName)
+                            {
+                                <option>@tmp</option>
+                            }
+                        }
 
-        </tr>
-        <tr>
-            <th>需要日期</th>
-            <td colspan="3"><input type="date" /></td>
-        </tr>
-        <tr>
-            <th></th>
-            <td colspan="3">
-                <input type="button" value="查詢" />
-                <input type="button" value="清除" />
-                <input type="button" value="新增訂單" />
-            </td>
-        </tr>
-    </table>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>出貨公司</th>
+                <td colspan="3">
+                    <select name="ship">
+                        <option value="00">請選擇出貨公司</option>
+                        @if (ViewBag.coName != null)
+                        {
+                            foreach (var tmp in (List<String>)ViewBag.coName)
+                            {
+                                <option>@tmp</option>
+                            }
+                        }
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>訂購日期</th>
+                <td><input type="date" name="orderDate" /></td>
+
+                <th>出貨日期</th>
+                <td><input type="date" name="shipDate" /></td>
+
+            </tr>
+            <tr>
+                <th>需要日期</th>
+                <td colspan="3"><input type="date" name="needDate"/></td>
+            </tr>
+            <tr>
+                <th></th>
+                <td colspan="3">
+                    <input type="submit" value="查詢">
+                    <input type="reset" value="清除">
+                    <input type="button" value="新增訂單">
+                </td>
+            </tr>
+        </table>
+    }
+        
+    
 </body>
 
 </html>
