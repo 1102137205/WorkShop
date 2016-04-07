@@ -1,0 +1,108 @@
+﻿
+@{
+    ViewBag.Title = "資料修改";
+}
+
+<h2>資料修改</h2>
+
+<html>
+<body>
+    @using (Html.BeginForm("update", "Order", FormMethod.Post))
+    {
+        <table border="1" style="width:100%" border-collapse="collapse">
+            <tr>
+                <th>訂單編號</th>
+                <td colspan="3">
+                    <input type="text" name="orderId" value=@ViewBag.OrderData.OrderID enable="false">
+                </td>
+            </tr>
+            <tr>
+                <th>客戶名稱</th>
+                <td colspan="3">
+                    <select name="custName">
+                        <option selected value=@ViewBag.CustomersCompanyName>@ViewBag.CustomersCompanyName</option>
+
+                        @foreach (var item in (List<String>)ViewBag.CompanyNameList)
+                        {
+                            <option value=@item>@item</option>
+                        }
+
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>負責員工名稱</th>
+                <td colspan="3">
+                    <select name="employeeName">
+                        <option selected value=@ViewBag.LastName>@ViewBag.LastName</option>
+
+                        @foreach (var item in (List<String>)ViewBag.lastNameList)
+                        {
+                            <option value=@item>@item</option>
+                        }
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>訂單日期</th>
+                <td><input type="date" name="orderDate" value="@ViewBag.OrderDate" /></td>
+                <th>需要日期</th>
+                <td><input type="date" name="needDate" value="@ViewBag.RequiredDate" /></td>
+            </tr>
+            <tr>
+                <th>出貨日期</th>
+                <td colspan="3"><input type="date" name="shipDate" value="@ViewBag.ShippedDate" /></td>
+            </tr>
+            <tr>
+                <th>出貨公司名稱</th>
+                <td colspan="3">
+                    <select name="shipCompanyName">
+                        <option selected value=@ViewBag.ShippersCompanyName>@ViewBag.ShippersCompanyName</option>
+
+                        @foreach (var item in (List<String>)ViewBag.shipNameList)
+                        {
+                            <option value=@item>@item</option>
+                        }
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>運費</th>
+                <td colspan="3"><input type="text" name="shipCost" value="@ViewBag.OrderData.Freight" /></td>
+            </tr>
+            <tr>
+                <th>出貨國家</th>
+                <td><input type="text" name="shipCountry" value="@ViewBag.OrderData.ShipCountry" /></td>
+                <th>出貨城市</th>
+                <td><input type="text" name="shipCity" value="@ViewBag.OrderData.ShipCity" /></td>
+            </tr>
+            <tr>
+                <th>出貨地區</th>
+                <td><input type="text" name="shipRegion" value="@ViewBag.OrderData.ShipRegion" /></td>
+                <th>郵遞區號</th>
+                <td><input type="text" name="shipAddressNo" value="@ViewBag.OrderData.ShipPostalCode" /></td>
+            </tr>
+            <tr>
+                <th>出貨地址</th>
+                <td><input type="text" name="shipAddress" value="@ViewBag.OrderData.ShipAddress" /></td>
+                <th>出貨說明</th>
+                <td><input type="text" name="shipDesc" value="@ViewBag.OrderData.ShipName" /></td>
+            </tr>
+            <tr>
+                <th>訂單金額總計</th>
+                <td colspan="3"><input type="text" value="@ViewBag.total"></td>
+            </tr>
+            <tr>
+                <th></th>
+                <td colspan="3">
+                    <input type="submit" value="存檔">
+                    <a href=""><input type="button" value="刪除本筆訂單"></a>
+                    <a href=""><input type="button" value="取消"></a>
+                </td>
+            </tr>
+
+        </table>
+    }   
+</body>
+</html>
+

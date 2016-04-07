@@ -128,6 +128,7 @@
     <Content Include="Views\Order\Index.cshtml" />
     <Content Include="Views\Order\search.cshtml" />
     <Content Include="Views\Order\update.cshtml" />
+    <Content Include="Views\Order\resultUpdate.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
