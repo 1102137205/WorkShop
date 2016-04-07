@@ -137,6 +137,15 @@ namespace WorkShop.Controllers
 
             #endregion
 
+            #region 填入明細資料
+            List<OrderDetails> orderDetail = db.OrderDetails.Where(x => x.OrderID.ToString() == orderId).ToList();
+            List<String> ProductName = db.Products.Select(x=>x.ProductName).ToList();
+
+            ViewBag.orderDetail = orderDetail;
+            ViewBag.ProductName = ProductName;
+
+            #endregion
+
             #region 計算總金額
 
             Double total = 0; 

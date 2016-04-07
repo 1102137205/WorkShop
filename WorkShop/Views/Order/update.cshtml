@@ -13,7 +13,7 @@
             <tr>
                 <th>訂單編號</th>
                 <td colspan="3">
-                    <input type="text" name="orderId" value=@ViewBag.OrderData.OrderID enable="false">
+                    <input type="text" name="orderId" value=@ViewBag.OrderData.OrderID disabled>
                 </td>
             </tr>
             <tr>
@@ -103,6 +103,57 @@
 
         </table>
     }   
+    <br/>
+    <h5>訂單明細</h5>
+
+    <button>新增訂單</button>
+
+    <table border="1" style="width:100%" >
+        <tr>
+            <th>商品</th><th>單價</th><th>數量</th><th>小計</th><th></th>
+        </tr>
+            
+            @foreach (var item in (List<WorkShop.Models.OrderDetails>) ViewBag.orderDetail)
+            {
+                <tr>
+                    <td>
+                        <select id="product" onchange="">
+                            <option>@item.Products.ProductName</option>
+                        </select>
+                    </td>
+                    <td><input type="text" value="@item.UnitPrice" disabled /></td>
+                    <td><input type="text" value="@item.Qty" disabled /></td>
+                    <td><input type="text" disabled /></td>
+                    <td><input type="button" value="取消" /></td>
+                </tr>
+            }
+
+        <tr>
+            <td>
+                <select>
+                    <option value="">請選擇商品</option>
+                    @foreach (var item in (List<String>)ViewBag.ProductName)
+                    {
+                        <option>@item</option>
+                    }
+                    
+                </select>
+            </td>
+            <td><input type="text" disabled /></td>
+            <td><input type="text" disabled /></td>
+            <td><input type="text" disabled /></td>
+            <td><input type="button" value="取消" /></td>
+        </tr>
+
+    </table>
+
 </body>
 </html>
+<script type="text/javascript">
+
+    function selectProduct() {
+
+    }
+
+</script>
 
