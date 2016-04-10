@@ -13,18 +13,18 @@
             <tr>
                 <th>訂單編號</th>
                 <td colspan="3">
-                    <input type="text" name="orderId" value=@ViewBag.OrderData.OrderID disabled>
+                    <input type="text" name="orderId" value="@ViewBag.OrderData.OrderID" readonly="readonly" required>
                 </td>
             </tr>
             <tr>
                 <th>客戶名稱</th>
                 <td colspan="3">
-                    <select name="custName">
-                        <option selected value=@ViewBag.CustomersCompanyName>@ViewBag.CustomersCompanyName</option>
+                    <select name="custName" required>
+                        <option selected value="@ViewBag.CustomersCompanyId">@ViewBag.CustomersCompanyName</option>
 
-                        @foreach (var item in (List<String>)ViewBag.CompanyNameList)
+                        @foreach (var item in (List<WorkShop.Models.Customers>)ViewBag.CompanyList)
                         {
-                            <option value=@item>@item</option>
+                            <option value="@item.CustomerID">@item.CompanyName</option>
                         }
 
                     </select>
@@ -33,21 +33,21 @@
             <tr>
                 <th>負責員工名稱</th>
                 <td colspan="3">
-                    <select name="employeeName">
-                        <option selected value=@ViewBag.LastName>@ViewBag.LastName</option>
+                    <select name="employeeName" required>
+                        <option selected value="@ViewBag.LastId">@ViewBag.LastName</option>
 
-                        @foreach (var item in (List<String>)ViewBag.lastNameList)
+                        @foreach (var item in (List<WorkShop.Models.Employees>)ViewBag.lastNameList)
                         {
-                            <option value=@item>@item</option>
+                            <option value="@item.EmployeeID">@item.LastName</option>
                         }
                     </select>
                 </td>
             </tr>
             <tr>
                 <th>訂單日期</th>
-                <td><input type="date" name="orderDate" value="@ViewBag.OrderDate" /></td>
+                <td><input type="date" name="orderDate" value="@ViewBag.OrderDate" required /></td>
                 <th>需要日期</th>
-                <td><input type="date" name="needDate" value="@ViewBag.RequiredDate" /></td>
+                <td><input type="date" name="needDate" value="@ViewBag.RequiredDate" required /></td>
             </tr>
             <tr>
                 <th>出貨日期</th>
@@ -57,18 +57,18 @@
                 <th>出貨公司名稱</th>
                 <td colspan="3">
                     <select id="ship" name="shipCompanyName">
-                        <option selected value=@ViewBag.shipperId>@ViewBag.ShippersCompanyName</option>
+                        <option selected value="@ViewBag.ShippersCompanyId">@ViewBag.ShippersCompanyName</option>
 
                         @foreach (var item in (List<WorkShop.Models.Shippers>)ViewBag.shipList)
                         {
-                            <option value=@item.ShipperID>@item.CompanyName</option>
+                            <option value="@item.ShipperID">@item.CompanyName</option>
                         }
                     </select>
                 </td>
             </tr>
             <tr>
                 <th>運費</th>
-                <td colspan="3"><input type="text" id="shipCost" name="shipCost" value="@ViewBag.OrderData.Freight" /></td>
+                <td colspan="3"><input type="text" id="shipCost" name="shipCost" value="@ViewBag.OrderData.Freight" oninput="changeTotal()" /></td>
             </tr>
             <tr>
                 <th>出貨國家</th>
@@ -90,7 +90,7 @@
             </tr>
             <tr>
                 <th>訂單金額總計</th>
-                <td colspan="3"><input type="text" id="total" value="@ViewBag.total"></td>
+                <td colspan="3"><input type="text" id="total" value="@ViewBag.total" disabled></td>
             </tr>
             <tr>
                 <th></th>
@@ -102,22 +102,22 @@
             </tr>
 
         </table>
-    }   
-    <br/>
-    <h5>訂單明細</h5>
+       
+        <br/>
+        <h5>訂單明細</h5>
 
-    <input type="button" value="新增訂單" onclick="addRow()" />
+        <input type="button" value="新增訂單" onclick="addRow()" />
 
-    <table id="orderDetailTable" border="1" style="width:100%">
-        <tr>
-            <th>商品</th>
-            <th>單價</th>
-            <th>數量</th>
-            <th>小計</th>
-            <th></th>
-        </tr>
-    </table>
-
+        <table id="orderDetailTable" border="1" style="width:100%">
+            <tr>
+                <th>商品</th>
+                <th>單價</th>
+                <th>數量</th>
+                <th>小計</th>
+                <th></th>
+            </tr>
+        </table>
+    }
 </body>
 </html>
 <script type="text/javascript">
@@ -130,56 +130,58 @@
         var orderDetailTable = document.getElementById("orderDetailTable");
         var tableObjs = orderDetailTable.tBodies[0];
 
-        @foreach (var item in (List<WorkShop.Models.OrderDetails>)ViewBag.orderDetail) {
+        @foreach (var item in (List<WorkShop.Models.OrderDetails>)ViewBag.orderDetail)
+        {
 
             @:count++;
-            @:var tr = document.createElement("tr");
-            @:var product = document.createElement("td");
+                    @:var tr = document.createElement("tr");
+                    @:var product = document.createElement("td");
 
             //select option
             @:var select = document.createElement("select");
-            @:select.setAttribute("id", "product" + count);
-            @:select.setAttribute("onchange", "changeProduct('product" + count + "')");
-            @:select.appendChild(new Option("@item.Products.ProductName", "@item.ProductID"));
+                    @:select.setAttribute("id", "product" + count);
+                    @:select.setAttribute("onchange", "changeProduct('product" + count + "')");
+                    @:select.setAttribute("name", "productName");
+                    @:select.appendChild(new Option("@item.Products.ProductName", "@item.ProductID"));
 
             foreach (var tmp in (List<WorkShop.Models.Products>)ViewBag.ProductData)
             {
                 @: select.appendChild(new Option("@tmp.ProductName", "@tmp.ProductID"));
-            }
+                    }
 
             @:product.appendChild(select);
 
             //pricetext
             @:var price = document.createElement("td");
-            @:price.innerHTML = "<input type='text' id ='price" + count + "' name='price' value = '@item.UnitPrice'/>";
+                    @:price.innerHTML = "<input type='text' id ='price" + count + "' name='price' value = '@item.UnitPrice' oninput='changeSubtotal("+count+")'/>";
 
             //qtytext
             @:var qty = document.createElement("td");
-            @:qty.innerHTML = "<input type='text' id='qty"+count+"' name='qty' value='@item.Qty' oninput='changeQty("+count+")'/>";
+                    @:qty.innerHTML = "<input type='text' id='qty"+count+"' name='qty' value='@item.Qty' oninput='changeSubtotal("+count+")'/>";
 
             //subtotaltext
             @:var sum = @item.UnitPrice * @item.Qty;
-            @:var subtotal = document.createElement("td");
-            @:subtotal.innerHTML = "<input type='text' id='subtotal" + count + "' name='subtotal' value='"+sum+"' disabled='true' />";
-            
+                    @:var subtotal = document.createElement("td");
+                    @:subtotal.innerHTML = "<input type='text' id='subtotal" + count + "' name='subtotal' value='"+sum+"' onchange='changeTotal()' disabled />";
+
             //cancelbutton
             @:var cancle = document.createElement("td");
-            @:var button = document.createElement("button");
+                    @:var button = document.createElement("button");
 
-            @:button.innerText = "取消";
-            @:button.setAttribute("id", count);
-            @:button.setAttribute("onclick", "delRow(" + count + ")");
+            @:button.innerText = "刪除";
+                    @:button.setAttribute("id", count);
+                    @:button.setAttribute("onclick", "delRow(" + count + ")");
 
             @:cancle.appendChild(button);
 
 
             @:tr.appendChild(product);
-            @:tr.appendChild(price);
-            @:tr.appendChild(qty);
-            @:tr.appendChild(subtotal);
-            @:tr.appendChild(cancle);
-            @:tableObjs.appendChild(tr);
-        }
+                    @:tr.appendChild(price);
+                    @:tr.appendChild(qty);
+                    @:tr.appendChild(subtotal);
+                    @:tr.appendChild(cancle);
+                    @:tableObjs.appendChild(tr);
+                }
 
 
 
@@ -191,7 +193,8 @@
         var select = document.createElement("select");
 
         select.setAttribute("id", "product" + count);
-        select.setAttribute("onchange", "changeProduct(product" + count + ")");
+        select.setAttribute("onchange", "changeProduct('product" + count + "')");
+        select.setAttribute("name", "productName");
 
         select.appendChild(new Option("請選擇商品", ""));
 
@@ -207,21 +210,21 @@
     function priceText(tr) {
         var price = document.createElement("td");
         price.setAttribute("id", price);
-        price.innerHTML = "<input type='text' id ='price" + count + "' name='price' />";
+        price.innerHTML = "<input type='text' id ='price" + count + "' name='price' value='0' oninput='changeSubtotal("+count+")' />";
 
         tr.appendChild(price);
     }
 
     function qtyText(tr) {
         var qty = document.createElement("td");
-        qty.innerHTML = "<input type='text' id ='qty" + count + "' name='qty' />";
+        qty.innerHTML = "<input type='text' id ='qty" + count + "' name='qty' value='1' oninput='changeSubtotal("+count+")' />";
 
         tr.appendChild(qty);
     }
 
     function subtotalText(tr) {
         var subtotal = document.createElement("td");
-        subtotal.innerHTML = "<input type='text' id ='subtotal" + count + "' name='subtotal' disable />";
+        subtotal.innerHTML = "<input type='text' id ='subtotal" + count + "' name='subtotal' value='0' disabled />";
 
         tr.appendChild(subtotal);
     }
@@ -231,7 +234,7 @@
 
         var button = document.createElement("button");
 
-        button.innerText = "取消";
+        button.innerText = "刪除";
         button.setAttribute("id", count);
         button.setAttribute("onclick", "delRow(" + count + ")");
 
@@ -260,7 +263,7 @@
 
         if (num != count) {
             num++;
-        } 
+        }
         orderDetailTable.deleteRow(num);
         count--;
     }
@@ -273,6 +276,7 @@
         for (var i = 0; i < select.options.length; i++) {
             if (select.options[i].selected) {
                 changePrice(select.options[i].value, select.id);
+                changeTotal();
                 break;
             }
         }
@@ -285,8 +289,6 @@
         var price = document.getElementById("price"+id);
         var qty = document.getElementById("qty"+id);
         var subtotal = document.getElementById("subtotal"+id);
-        var total = document.getElementById("total");
-        var shipCost = document.getElementById("shipCost");
 
         $.ajax({
             type: "GET",
@@ -299,17 +301,31 @@
             success: function (msg) {
                 price.value = msg;
                 subtotal.value = Math.round(msg * qty.value);
-                total.value = subtotal.value - shipCost.value;
             }
         });
     }
 
-    function changeQty(idCount){
+    //修改單價或數量改變小計
+    function changeSubtotal(idCount){
         var qty = document.getElementById("qty"+idCount);
         var price = document.getElementById("price"+idCount);
         var subtotal = document.getElementById("subtotal"+idCount);
 
         subtotal.value = Math.round(qty.value * price.value);
+        changeTotal();
+    }
+
+    function changeTotal(){
+        var total = document.getElementById("total");
+        var shipCost = document.getElementById("shipCost");
+
+        total = 0;
+        var length = document.getElementById("orderDetailTable").rows.length-1;
+        var subtotalSum = 0;
+        for(var i=0;i<length;i++){
+            subtotalSum = subtotalSum +  document.getElementsByName("subtotal")[i].value;
+        }
+        total.value = subtotalSum - shipCost.value;
     }
 
 

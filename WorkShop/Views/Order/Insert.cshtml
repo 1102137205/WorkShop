@@ -22,9 +22,9 @@
                     <select name="custName">
                         <option value="">請選擇客戶名稱</option>
 
-                        @foreach (var item in (List<String>)ViewBag.customerName)
+                        @foreach (var item in (List<WorkShop.Models.Customers>)ViewBag.customer)
                         {
-                            <option value="@item">@item</option>
+                            <option value="@item.CustomerID">@item.CompanyName</option>
                         }
                     </select>
                 </td>
@@ -35,9 +35,9 @@
                     <select name="employeeName">
                         <option value="">請選擇負責員工名稱</option>
 
-                        @foreach (var item in (List<String>)ViewBag.employeeName)
+                        @foreach (var item in (List<WorkShop.Models.Employees>)ViewBag.employee)
                         {
-                            <option value="@item">@item</option>
+                            <option value="@item.EmployeeID">@item.LastName</option>
                         }
                     </select>
                 </td>
@@ -58,9 +58,9 @@
                     <select name="shipCompanyName">
                         <option value="">請選擇出貨公司名稱</option>
 
-                        @foreach (var item in (List<String>)ViewBag.ShipCompanyName)
+                        @foreach (var item in (List<WorkShop.Models.Shippers>)ViewBag.ShipCompany)
                         {
-                            <option value="@item">@item</option>
+                            <option value="@item.ShipperID">@item.CompanyName</option>
                         }
                     </select>
                 </td>
