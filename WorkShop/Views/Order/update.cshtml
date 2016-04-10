@@ -1,12 +1,12 @@
 ﻿
 @{
-    ViewBag.Title = "資料修改";
+    ViewBag.Title = "訂單修改";
 }
 
-<h2>資料修改</h2>
+<h2>訂單修改</h2>
 
 <html>
-<body>
+<body onload="loadTable()">
     @using (Html.BeginForm("update", "Order", FormMethod.Post))
     {
         <table border="1" style="width:100%" border-collapse="collapse">
@@ -56,19 +56,19 @@
             <tr>
                 <th>出貨公司名稱</th>
                 <td colspan="3">
-                    <select name="shipCompanyName">
-                        <option selected value=@ViewBag.ShippersCompanyName>@ViewBag.ShippersCompanyName</option>
+                    <select id="ship" name="shipCompanyName">
+                        <option selected value=@ViewBag.shipperId>@ViewBag.ShippersCompanyName</option>
 
-                        @foreach (var item in (List<String>)ViewBag.shipNameList)
+                        @foreach (var item in (List<WorkShop.Models.Shippers>)ViewBag.shipList)
                         {
-                            <option value=@item>@item</option>
+                            <option value=@item.ShipperID>@item.CompanyName</option>
                         }
                     </select>
                 </td>
             </tr>
             <tr>
                 <th>運費</th>
-                <td colspan="3"><input type="text" name="shipCost" value="@ViewBag.OrderData.Freight" /></td>
+                <td colspan="3"><input type="text" id="shipCost" name="shipCost" value="@ViewBag.OrderData.Freight" /></td>
             </tr>
             <tr>
                 <th>出貨國家</th>
@@ -90,14 +90,14 @@
             </tr>
             <tr>
                 <th>訂單金額總計</th>
-                <td colspan="3"><input type="text" value="@ViewBag.total"></td>
+                <td colspan="3"><input type="text" id="total" value="@ViewBag.total"></td>
             </tr>
             <tr>
                 <th></th>
                 <td colspan="3">
                     <input type="submit" value="存檔">
                     <a href=""><input type="button" value="刪除本筆訂單"></a>
-                    <a href=""><input type="button" value="取消"></a>
+                    <a href="/Order/search?employee=00&ship=00"><input type="button" value="取消"></a>
                 </td>
             </tr>
 
@@ -106,54 +106,212 @@
     <br/>
     <h5>訂單明細</h5>
 
-    <button>新增訂單</button>
+    <input type="button" value="新增訂單" onclick="addRow()" />
 
-    <table border="1" style="width:100%" >
+    <table id="orderDetailTable" border="1" style="width:100%">
         <tr>
-            <th>商品</th><th>單價</th><th>數量</th><th>小計</th><th></th>
+            <th>商品</th>
+            <th>單價</th>
+            <th>數量</th>
+            <th>小計</th>
+            <th></th>
         </tr>
-            
-            @foreach (var item in (List<WorkShop.Models.OrderDetails>) ViewBag.orderDetail)
-            {
-                <tr>
-                    <td>
-                        <select id="product" onchange="">
-                            <option>@item.Products.ProductName</option>
-                        </select>
-                    </td>
-                    <td><input type="text" value="@item.UnitPrice" disabled /></td>
-                    <td><input type="text" value="@item.Qty" disabled /></td>
-                    <td><input type="text" disabled /></td>
-                    <td><input type="button" value="取消" /></td>
-                </tr>
-            }
-
-        <tr>
-            <td>
-                <select>
-                    <option value="">請選擇商品</option>
-                    @foreach (var item in (List<String>)ViewBag.ProductName)
-                    {
-                        <option>@item</option>
-                    }
-                    
-                </select>
-            </td>
-            <td><input type="text" disabled /></td>
-            <td><input type="text" disabled /></td>
-            <td><input type="text" disabled /></td>
-            <td><input type="button" value="取消" /></td>
-        </tr>
-
     </table>
 
 </body>
 </html>
 <script type="text/javascript">
 
-    function selectProduct() {
+    //table row length
+    var count = document.getElementById("orderDetailTable").rows.length - 1;
+
+    function loadTable() {
+
+        var orderDetailTable = document.getElementById("orderDetailTable");
+        var tableObjs = orderDetailTable.tBodies[0];
+
+        @foreach (var item in (List<WorkShop.Models.OrderDetails>)ViewBag.orderDetail) {
+
+            @:count++;
+            @:var tr = document.createElement("tr");
+            @:var product = document.createElement("td");
+
+            //select option
+            @:var select = document.createElement("select");
+            @:select.setAttribute("id", "product" + count);
+            @:select.setAttribute("onchange", "changeProduct('product" + count + "')");
+            @:select.appendChild(new Option("@item.Products.ProductName", "@item.ProductID"));
+
+            foreach (var tmp in (List<WorkShop.Models.Products>)ViewBag.ProductData)
+            {
+                @: select.appendChild(new Option("@tmp.ProductName", "@tmp.ProductID"));
+            }
+
+            @:product.appendChild(select);
+
+            //pricetext
+            @:var price = document.createElement("td");
+            @:price.innerHTML = "<input type='text' id ='price" + count + "' name='price' value = '@item.UnitPrice'/>";
+
+            //qtytext
+            @:var qty = document.createElement("td");
+            @:qty.innerHTML = "<input type='text' id='qty"+count+"' name='qty' value='@item.Qty' oninput='changeQty("+count+")'/>";
+
+            //subtotaltext
+            @:var sum = @item.UnitPrice * @item.Qty;
+            @:var subtotal = document.createElement("td");
+            @:subtotal.innerHTML = "<input type='text' id='subtotal" + count + "' name='subtotal' value='"+sum+"' disabled='true' />";
+            
+            //cancelbutton
+            @:var cancle = document.createElement("td");
+            @:var button = document.createElement("button");
+
+            @:button.innerText = "取消";
+            @:button.setAttribute("id", count);
+            @:button.setAttribute("onclick", "delRow(" + count + ")");
+
+            @:cancle.appendChild(button);
+
+
+            @:tr.appendChild(product);
+            @:tr.appendChild(price);
+            @:tr.appendChild(qty);
+            @:tr.appendChild(subtotal);
+            @:tr.appendChild(cancle);
+            @:tableObjs.appendChild(tr);
+        }
+
+
 
     }
+
+
+    function selectProduct(tr) {
+        var product = document.createElement("td");
+        var select = document.createElement("select");
+
+        select.setAttribute("id", "product" + count);
+        select.setAttribute("onchange", "changeProduct(product" + count + ")");
+
+        select.appendChild(new Option("請選擇商品", ""));
+
+        @foreach (var item in (List<WorkShop.Models.Products>)ViewBag.ProductData)
+        {
+            @: select.appendChild(new Option("@item.ProductName", "@item.ProductID"));
+        }
+
+        product.appendChild(select);
+        tr.appendChild(product);
+    }
+
+    function priceText(tr) {
+        var price = document.createElement("td");
+        price.setAttribute("id", price);
+        price.innerHTML = "<input type='text' id ='price" + count + "' name='price' />";
+
+        tr.appendChild(price);
+    }
+
+    function qtyText(tr) {
+        var qty = document.createElement("td");
+        qty.innerHTML = "<input type='text' id ='qty" + count + "' name='qty' />";
+
+        tr.appendChild(qty);
+    }
+
+    function subtotalText(tr) {
+        var subtotal = document.createElement("td");
+        subtotal.innerHTML = "<input type='text' id ='subtotal" + count + "' name='subtotal' disable />";
+
+        tr.appendChild(subtotal);
+    }
+
+    function cancelButton(tr) {
+        var cancle = document.createElement("td");
+
+        var button = document.createElement("button");
+
+        button.innerText = "取消";
+        button.setAttribute("id", count);
+        button.setAttribute("onclick", "delRow(" + count + ")");
+
+        cancle.appendChild(button);
+        tr.appendChild(cancle);
+    }
+
+    function addRow() {
+        count++;
+        var orderDetailTable = document.getElementById("orderDetailTable");
+
+        var tableObjs = orderDetailTable.tBodies[0];
+        var tr = document.createElement("tr");
+
+        selectProduct(tr);
+        priceText(tr);
+        qtyText(tr);
+        subtotalText(tr);
+        cancelButton(tr);
+
+        tableObjs.appendChild(tr);
+    }
+
+    function delRow(num) {
+        var orderDetailTable = document.getElementById("orderDetailTable");
+
+        if (num != count) {
+            num++;
+        } 
+        orderDetailTable.deleteRow(num);
+        count--;
+    }
+
+    //選擇商品改變單價改變小計
+    function changeProduct(selectID) {
+
+        var select = document.getElementById(selectID);
+
+        for (var i = 0; i < select.options.length; i++) {
+            if (select.options[i].selected) {
+                changePrice(select.options[i].value, select.id);
+                break;
+            }
+        }
+
+    }
+
+    function changePrice(productId, selectId) {
+
+        var id = selectId.substring(7);
+        var price = document.getElementById("price"+id);
+        var qty = document.getElementById("qty"+id);
+        var subtotal = document.getElementById("subtotal"+id);
+        var total = document.getElementById("total");
+        var shipCost = document.getElementById("shipCost");
+
+        $.ajax({
+            type: "GET",
+            url: "/Order/OrderPrice",
+            data: {
+                productId: productId
+            },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (msg) {
+                price.value = msg;
+                subtotal.value = Math.round(msg * qty.value);
+                total.value = subtotal.value - shipCost.value;
+            }
+        });
+    }
+
+    function changeQty(idCount){
+        var qty = document.getElementById("qty"+idCount);
+        var price = document.getElementById("price"+idCount);
+        var subtotal = document.getElementById("subtotal"+idCount);
+
+        subtotal.value = Math.round(qty.value * price.value);
+    }
+
 
 </script>
 

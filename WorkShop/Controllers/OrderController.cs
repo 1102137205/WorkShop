@@ -76,6 +76,7 @@ namespace WorkShop.Controllers
             String CustomersCompanyName = "";
             String LastName = "";
             String ShippersCompanyName = "";
+            String ShipperID = "";
 
             String OrderDate = "";
             String orderMonth = "";
@@ -107,7 +108,7 @@ namespace WorkShop.Controllers
                 ShippedDate = String.Format("{0}-{1}-{2}", Convert.ToDateTime(tmp.ShippedDate).Year, shippedMonth, shippedDay);
 
                 ShippersCompanyName = tmp.Shippers.CompanyName;
-
+                ShipperID = tmp.Shippers.ShipperID.ToString();
                 data.Freight = tmp.Freight;
                 data.ShipCountry = tmp.ShipCountry;
                 data.ShipCity = tmp.ShipCity;
@@ -121,7 +122,7 @@ namespace WorkShop.Controllers
             ViewBag.LastName = LastName;
             ViewBag.CustomersCompanyName = CustomersCompanyName;
             ViewBag.ShippersCompanyName = ShippersCompanyName;
-
+            ViewBag.ShipperID = ShipperID;
             ViewBag.OrderDate = OrderDate;
             ViewBag.RequiredDate = RequiredDate;
             ViewBag.ShippedDate = ShippedDate;
@@ -132,38 +133,40 @@ namespace WorkShop.Controllers
             List<String> lastNameList = db.Employees.Where(x => x.LastName != LastName).Select(x => x.LastName).ToList();
             ViewBag.lastNameList = lastNameList;
 
-            List<String> shipNameList = db.Shippers.Where(x => x.CompanyName != ShippersCompanyName).Select(x => x.CompanyName).ToList();
-            ViewBag.shipNameList = shipNameList;
+            List<Shippers> shipList = db.Shippers.Where(x => x.ShipperID.ToString() != ShipperID).ToList();
+            ViewBag.shipList = shipList;
+
+            
 
             #endregion
 
             #region 填入明細資料
             List<OrderDetails> orderDetail = db.OrderDetails.Where(x => x.OrderID.ToString() == orderId).ToList();
-            List<String> ProductName = db.Products.Select(x=>x.ProductName).ToList();
 
+            List<Products> ProductData = db.Products.ToList();
             ViewBag.orderDetail = orderDetail;
-            ViewBag.ProductName = ProductName;
+
+            ViewBag.ProductData = ProductData;
 
             #endregion
 
             #region 計算總金額
 
-            Double total = 0; 
-
-            List<OrderDetails> OrderDetail = db.OrderDetails.Where(x => x.OrderID.ToString() == orderId).ToList();
-
-            foreach (var tmp in OrderDetail)
-            {
-                total = total + tmp.Qty * Convert.ToDouble(tmp.UnitPrice) - Convert.ToDouble(tmp.Discount);
-            }
-
-            total = total + Convert.ToDouble(data.Freight);
+            Double total = Convert.ToDouble(data.Freight);
             ViewBag.total = total;
 
             #endregion
 
             return View();
         }
+
+        public String OrderPrice(int productId) {
+
+            String changPrice = db.Products.Find(productId).UnitPrice.ToString();
+
+            return changPrice;
+        }
+
 
         public String DateFormat(String date)
         {
@@ -213,20 +216,68 @@ namespace WorkShop.Controllers
                 tmp.ShipPostalCode = shipAddressNo;
                 tmp.ShipAddress = shipAddress;
                 tmp.ShipName = shipDesc;
-            }
 
+                
+            }
+            
             db.SaveChanges();
 
             return RedirectToAction("Index");
         }
 
-        public ActionResult resultUpdate(String orderId) {
+        public ActionResult Insert() {
 
+            List<String> customerName = db.Customers.Select(x => x.CompanyName).ToList();
+            List<String> employeeName = db.Employees.Select(x => x.LastName).ToList();
+            List<String> ShipCompanyName = db.Shippers.Select(x => x.CompanyName).ToList();
 
-
+            ViewBag.customerName = customerName;
+            ViewBag.employeeName = employeeName;
+            ViewBag.ShipCompanyName = ShipCompanyName;
+            
             return View();
         }
 
+        [HttpPost]
+        public ActionResult Insert(FormCollection inputs) {
+
+            String orderId = inputs["orderId"];
+            String custName = inputs["custName"];
+            String employeeName = inputs["employeeName"];
+            String orderDate = inputs["orderDate"];
+            String needDate = inputs["needDate"];
+            String shipDate = inputs["shipDate"];
+            String shipCompanyName = inputs["shipCompanyName"];
+            String shipCost = inputs["shipCost"];
+            String shipCountry = inputs["shipCountry"];
+            String shipCity = inputs["shipCity"];
+            String shipRegion = inputs["shipRegion"];
+            String shipAddressNo = inputs["shipAddressNo"];
+            String shipAddress = inputs["shipAddress"];
+            String shipDesc = inputs["shipDesc"];
+
+            Orders data = new Orders();
+
+            data.OrderID = Convert.ToInt32(orderId);
+            data.Customers.CompanyName = custName;
+            data.Employees.LastName = employeeName;
+            data.OrderDate = Convert.ToDateTime(orderDate);
+            data.RequiredDate = Convert.ToDateTime(needDate);
+            data.ShippedDate = Convert.ToDateTime(shipDate);
+            data.Shippers.CompanyName = shipCompanyName;
+            data.Freight = Convert.ToDecimal(shipCost);
+            data.ShipCountry = shipCountry;
+            data.ShipCity = shipCity;
+            data.ShipRegion = shipRegion;
+            data.ShipPostalCode = shipAddressNo;
+            data.ShipAddress = shipAddress;
+            data.ShipName = shipDesc;
+
+            db.Orders.Add(data);
+            db.SaveChanges();
+
+            return RedirectToAction("Index");
+        }
 
         
 

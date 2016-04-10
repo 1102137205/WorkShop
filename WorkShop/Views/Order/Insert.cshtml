@@ -1,0 +1,106 @@
+﻿@{
+    ViewBag.Title = "新增訂單";
+}
+
+<h2>新增訂單</h2>
+
+<html>
+
+<body>
+    @using (Html.BeginForm("Insert", "Order", FormMethod.Post)) 
+    { 
+        <table border="1" style="width:100%" border-collapse="collapse">
+            <tr>
+                <th>訂單編號</th>
+                <td colspan="3">
+                    <input type="text" name="orderId">
+                </td>
+            </tr>
+            <tr>
+                <th>客戶名稱</th>
+                <td colspan="3">
+                    <select name="custName">
+                        <option value="">請選擇客戶名稱</option>
+
+                        @foreach (var item in (List<String>)ViewBag.customerName)
+                        {
+                            <option value="@item">@item</option>
+                        }
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>負責員工名稱</th>
+                <td colspan="3">
+                    <select name="employeeName">
+                        <option value="">請選擇負責員工名稱</option>
+
+                        @foreach (var item in (List<String>)ViewBag.employeeName)
+                        {
+                            <option value="@item">@item</option>
+                        }
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>訂單日期</th>
+                <td><input type="date" name="orderDate" /></td>
+                <th>需要日期</th>
+                <td><input type="date" name="needDate" /></td>
+            </tr>
+            <tr>
+                <th>出貨日期</th>
+                <td colspan="3"><input type="date" name="shipDate" /></td>
+            </tr>
+            <tr>
+                <th>出貨公司名稱</th>
+                <td colspan="3">
+                    <select name="shipCompanyName">
+                        <option value="">請選擇出貨公司名稱</option>
+
+                        @foreach (var item in (List<String>)ViewBag.ShipCompanyName)
+                        {
+                            <option value="@item">@item</option>
+                        }
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>運費</th>
+                <td colspan="3"><input type="text" name="shipCost" /></td>
+            </tr>
+            <tr>
+                <th>出貨國家</th>
+                <td><input type="text" name="shipCountry" /></td>
+                <th>出貨城市</th>
+                <td><input type="text" name="shipCity" /></td>
+            </tr>
+            <tr>
+                <th>出貨地區</th>
+                <td><input type="text" name="shipRegion" /></td>
+                <th>郵遞區號</th>
+                <td><input type="text" name="shipAddressNo" /></td>
+            </tr>
+            <tr>
+                <th>出貨地址</th>
+                <td><input type="text" name="shipAddress" /></td>
+                <th>出貨說明</th>
+                <td><input type="text" name="shipDesc" /></td>
+            </tr>
+            <tr>
+                <th>訂單金額總計</th>
+                <td colspan="3"><input type="text"></td>
+            </tr>
+            <tr>
+                <th></th>
+                <td colspan="3">
+                    <input type="submit" value="存檔">
+                    <a href="/Order/Index"><input type="button" value="取消"></a>
+                </td>
+            </tr>
+
+        </table>
+    }
+</body>
+</html>
+
