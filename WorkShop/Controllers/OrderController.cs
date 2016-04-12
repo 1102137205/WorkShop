@@ -95,9 +95,9 @@ namespace WorkShop.Controllers
             foreach (var tmp in OrderData) {
                 data.OrderID = tmp.OrderID;
                 CustomersCompanyName = tmp.Customers.CompanyName;
-                CustomersCompanyId = tmp.Customers.CustomerID.ToString();
+                CustomersCompanyId = tmp.CustomerID.ToString();
                 LastName = tmp.Employees.LastName;
-                LastId = tmp.Employees.EmployeeID.ToString() ;
+                LastId = tmp.EmployeeID.ToString() ;
                 
                 orderMonth = DateFormat(tmp.OrderDate.Month.ToString());
                 orderDay = DateFormat(tmp.OrderDate.Day.ToString());
@@ -112,7 +112,7 @@ namespace WorkShop.Controllers
                 ShippedDate = String.Format("{0}-{1}-{2}", Convert.ToDateTime(tmp.ShippedDate).Year, shippedMonth, shippedDay);
 
                 ShippersCompanyName = tmp.Shippers.CompanyName;
-                ShippersCompanyId = tmp.Shippers.ShipperID.ToString();
+                ShippersCompanyId = tmp.ShipperID.ToString();
                 data.Freight = tmp.Freight;
                 data.ShipCountry = tmp.ShipCountry;
                 data.ShipCity = tmp.ShipCity;
@@ -237,20 +237,40 @@ namespace WorkShop.Controllers
             #endregion
 
             #region 修改明細資料
-            List<OrderDetails> dataDetail = db.OrderDetails.Where(x => x.OrderID.ToString() == orderId).ToList();
 
-            String productId = inputs["productName"];
-            String price = inputs["price"];
-            String qty = inputs["qty"];
+            int count = 0;
 
-            foreach (var tmp in dataDetail)
+            for (int i = 1; i < inputs.Count; i++)
             {
-                for (int i = 0; i < dataDetail.Count; i++)
+                if (inputs.AllKeys.Contains("productName[" + i + "]"))
                 {
-                    tmp.ProductID = Convert.ToInt32(productId[i]);
-                    tmp.UnitPrice = Convert.ToInt32(price[i]);
-                    tmp.Qty = Convert.ToInt16(qty[i]);
+                    count++;
                 }
+            }
+
+            List<OrderDetails> dataDetail = db.OrderDetails.Where(x=>x.OrderID ==data.OrderID).ToList();
+
+            int j = 0;
+            foreach (var tmp in dataDetail)
+	        {
+                j++;
+                tmp.ProductID = Convert.ToInt32(inputs["productName[" + j + "]"]);
+                tmp.UnitPrice = Convert.ToDecimal(inputs["price[" + j + "]"]);
+                tmp.Qty = Convert.ToInt16(inputs["qty[" + j + "]"]);
+
+                data.OrderDetails.Add(tmp);
+	        }
+
+            for (int i = j+1; i <= count; i++)
+            {
+                OrderDetails addOrderDetail = new OrderDetails();
+
+                addOrderDetail.OrderID = data.OrderID;
+                addOrderDetail.ProductID = Convert.ToInt32(inputs["productName[" + i + "]"]);
+                addOrderDetail.UnitPrice = Convert.ToDecimal(inputs["price[" + i + "]"]);
+                addOrderDetail.Qty = Convert.ToInt16(inputs["qty[" + i + "]"]);
+
+                data.OrderDetails.Add(addOrderDetail);
             }
 
             #endregion
@@ -265,11 +285,15 @@ namespace WorkShop.Controllers
             List<Customers> customer = db.Customers.ToList();
             List<Employees> employee = db.Employees.ToList();
             List<Shippers> ShipCompany = db.Shippers.ToList();
+            List<Products> ProductData = db.Products.ToList();
+
+            int orderId = db.Orders.Select(x=>x.OrderID).Max()+1;
 
             ViewBag.customer = customer;
             ViewBag.employee = employee;
             ViewBag.ShipCompany = ShipCompany;
-            
+            ViewBag.orderId = orderId;
+            ViewBag.ProductData = ProductData;
             return View();
         }
 
@@ -292,7 +316,7 @@ namespace WorkShop.Controllers
             String shipDesc = inputs["shipDesc"];
 
             Orders data = new Orders();
-
+            
             data.OrderID = Convert.ToInt32(orderId);
             data.CustomerID= Convert.ToInt32(custId);
             data.EmployeeID = Convert.ToInt32(employeeId);
@@ -301,7 +325,7 @@ namespace WorkShop.Controllers
             data.ShippedDate = !String.IsNullOrEmpty(shipDate) ? Convert.ToDateTime(shipDate) : Convert.ToDateTime("");
             data.ShipperID = Convert.ToInt32(shipCompanyId);
             data.Freight = !String.IsNullOrEmpty(shipCost) ? Convert.ToDecimal(shipCost) : 0;
-            data.ShipCountry = !String.IsNullOrEmpty(shipCost) ? shipCountry : "";
+            data.ShipCountry = !String.IsNullOrEmpty(shipCost) ? shipCountry :"";
             data.ShipCity = !String.IsNullOrEmpty(shipCost) ? shipCity : "";
             data.ShipRegion = !String.IsNullOrEmpty(shipRegion) ? shipRegion : "";
             data.ShipPostalCode = !String.IsNullOrEmpty(shipAddressNo) ? shipAddressNo : "";
@@ -309,12 +333,54 @@ namespace WorkShop.Controllers
             data.ShipName = !String.IsNullOrEmpty(shipDesc) ? shipDesc : "";
 
             db.Orders.Add(data);
+
+            int count = 0;
+
+            for (int i = 1; i < inputs.Count;i++)
+            {
+                if (inputs.AllKeys.Contains("productName["+i+"]")) {
+                    count++;
+                }
+            }
+
+            for (int i = 1; i <= count; i++) {
+                OrderDetails dataDetail = new OrderDetails();
+
+                dataDetail.OrderID = data.OrderID;
+                dataDetail.ProductID = Convert.ToInt32(inputs["productName["+i+"]"]);
+                dataDetail.UnitPrice = Convert.ToDecimal(inputs["price[" + i + "]"]);
+                dataDetail.Qty = Convert.ToInt16(inputs["qty[" + i + "]"]);
+
+                data.OrderDetails.Add(dataDetail);
+
+            }
+
+            
             db.SaveChanges();
 
             return RedirectToAction("Index");
         }
 
-        
+        public String delete(int orderId) {
+            Orders order = db.Orders.Find(orderId);
+            List<OrderDetails> orderDetail = db.OrderDetails.Where(x => x.OrderID == orderId).ToList();
+
+            String status = "";
+
+            try
+            {
+                db.Orders.Remove(order);
+                db.OrderDetails.RemoveRange(orderDetail);
+                db.SaveChanges();
+                status = "刪除成功";
+            }
+            catch {
+                status = "刪除失敗";
+            }
+
+
+            return status;
+        }
 
     }
 }

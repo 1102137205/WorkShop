@@ -13,7 +13,7 @@
             <tr>
                 <th>訂單編號</th>
                 <td colspan="3">
-                    <input type="text" name="orderId">
+                    <input type="text" name="orderId" value="@ViewBag.orderId" readonly="readonly">
                 </td>
             </tr>
             <tr>
@@ -100,7 +100,167 @@
             </tr>
 
         </table>
+
+        <br />
+        <h5>訂單明細</h5>
+
+        <input type="button" value="新增訂單" onclick="addRow()" />
+
+        <table id="orderDetailTable" border="1" style="width:100%">
+            <tr>
+                <th>商品</th>
+                <th>單價</th>
+                <th>數量</th>
+                <th>小計</th>
+                <th></th>
+            </tr>
+        </table>
     }
 </body>
 </html>
+
+<script type="text/javascript">
+
+    var count = document.getElementById("orderDetailTable").rows.length - 1;
+
+    function selectProduct(tr) {
+        var product = document.createElement("td");
+        var select = document.createElement("select");
+
+        select.setAttribute("id", "product" + count);
+        select.setAttribute("onchange", "changeProduct('product" + count + "')");
+        select.setAttribute("name", "productName["+count+"]");
+
+        select.appendChild(new Option("請選擇商品", ""));
+
+        @foreach (var item in (List<WorkShop.Models.Products>)ViewBag.ProductData)
+        {
+            @: select.appendChild(new Option("@item.ProductName", "@item.ProductID"));
+        }
+
+        product.appendChild(select);
+        tr.appendChild(product);
+    }
+
+    function priceText(tr) {
+        var price = document.createElement("td");
+        price.setAttribute("id", price);
+        price.innerHTML = "<input type='text' id ='price" + count + "' name='price["+count+"]' value='0' oninput='changeSubtotal("+count+")' />";
+
+        tr.appendChild(price);
+    }
+
+    function qtyText(tr) {
+        var qty = document.createElement("td");
+        qty.innerHTML = "<input type='text' id ='qty" + count + "' name='qty["+count+"]' value='1' oninput='changeSubtotal("+count+")' />";
+
+        tr.appendChild(qty);
+    }
+
+    function subtotalText(tr) {
+        var subtotal = document.createElement("td");
+        subtotal.innerHTML = "<input type='text' id ='subtotal" + count + "' name='subtotal' value='0' disabled />";
+
+        tr.appendChild(subtotal);
+    }
+
+    function cancelButton(tr) {
+        var cancle = document.createElement("td");
+
+        var button = document.createElement("button");
+
+        button.innerText = "刪除";
+        button.setAttribute("id", count);
+        button.setAttribute("onclick", "delRow(" + count + ")");
+
+        cancle.appendChild(button);
+        tr.appendChild(cancle);
+    }
+
+    function addRow() {
+        count++;
+        var orderDetailTable = document.getElementById("orderDetailTable");
+
+        var tableObjs = orderDetailTable.tBodies[0];
+        var tr = document.createElement("tr");
+
+        selectProduct(tr);
+        priceText(tr);
+        qtyText(tr);
+        subtotalText(tr);
+        cancelButton(tr);
+
+        tableObjs.appendChild(tr);
+    }
+
+    function delRow(num) {
+        var orderDetailTable = document.getElementById("orderDetailTable");
+
+        if (num != count) {
+            num++;
+        }
+        orderDetailTable.deleteRow(num);
+        count--;
+    }
+
+    //選擇商品改變單價改變小計
+    function changeProduct(selectID) {
+
+        var select = document.getElementById(selectID);
+
+        for (var i = 0; i < select.options.length; i++) {
+            if (select.options[i].selected) {
+                changePrice(select.options[i].value, select.id);
+                changeTotal();
+                break;
+            }
+        }
+
+    }
+
+    function changePrice(productId, selectId) {
+
+        var id = selectId.substring(7);
+        var price = document.getElementById("price"+id);
+        var qty = document.getElementById("qty"+id);
+        var subtotal = document.getElementById("subtotal"+id);
+
+        $.ajax({
+            type: "GET",
+            url: "/Order/OrderPrice",
+            data: {
+                productId: productId
+            },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (msg) {
+                price.value = msg;
+                subtotal.value = Math.round(msg * qty.value);
+            }
+        });
+    }
+
+    //修改單價或數量改變小計
+    function changeSubtotal(idCount){
+        var qty = document.getElementById("qty"+idCount);
+        var price = document.getElementById("price"+idCount);
+        var subtotal = document.getElementById("subtotal"+idCount);
+
+        subtotal.value = Math.round(qty.value * price.value);
+        changeTotal();
+    }
+
+    function changeTotal(){
+        var total = document.getElementById("total");
+        var shipCost = document.getElementById("shipCost");
+
+        total = 0;
+        var length = document.getElementById("orderDetailTable").rows.length-1;
+        var subtotalSum = 0;
+        for(var i=0;i<length;i++){
+            subtotalSum = subtotalSum +  document.getElementsByName("subtotal")[i].value;
+        }
+        total.value = subtotalSum - shipCost.value;
+    }
+</script>
 

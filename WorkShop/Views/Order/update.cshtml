@@ -96,7 +96,7 @@
                 <th></th>
                 <td colspan="3">
                     <input type="submit" value="存檔">
-                    <a href=""><input type="button" value="刪除本筆訂單"></a>
+                    <input type="button" value="刪除本筆訂單" onclick="delOrder('@ViewBag.OrderData.OrderID')">
                     <a href="/Order/search?employee=00&ship=00"><input type="button" value="取消"></a>
                 </td>
             </tr>
@@ -141,7 +141,7 @@
             @:var select = document.createElement("select");
                     @:select.setAttribute("id", "product" + count);
                     @:select.setAttribute("onchange", "changeProduct('product" + count + "')");
-                    @:select.setAttribute("name", "productName");
+                    @:select.setAttribute("name", "productName["+count+"]");
                     @:select.appendChild(new Option("@item.Products.ProductName", "@item.ProductID"));
 
             foreach (var tmp in (List<WorkShop.Models.Products>)ViewBag.ProductData)
@@ -153,11 +153,11 @@
 
             //pricetext
             @:var price = document.createElement("td");
-                    @:price.innerHTML = "<input type='text' id ='price" + count + "' name='price' value = '@item.UnitPrice' oninput='changeSubtotal("+count+")'/>";
+                    @:price.innerHTML = "<input type='text' id ='price" + count + "' name='price["+count+"]' value = '@item.UnitPrice' oninput='changeSubtotal("+count+")'/>";
 
             //qtytext
             @:var qty = document.createElement("td");
-                    @:qty.innerHTML = "<input type='text' id='qty"+count+"' name='qty' value='@item.Qty' oninput='changeSubtotal("+count+")'/>";
+                    @:qty.innerHTML = "<input type='text' id='qty"+count+"' name='qty["+count+"]' value='@item.Qty' oninput='changeSubtotal("+count+")'/>";
 
             //subtotaltext
             @:var sum = @item.UnitPrice * @item.Qty;
@@ -194,7 +194,7 @@
 
         select.setAttribute("id", "product" + count);
         select.setAttribute("onchange", "changeProduct('product" + count + "')");
-        select.setAttribute("name", "productName");
+        select.setAttribute("name", "productName["+count+"]");
 
         select.appendChild(new Option("請選擇商品", ""));
 
@@ -210,14 +210,14 @@
     function priceText(tr) {
         var price = document.createElement("td");
         price.setAttribute("id", price);
-        price.innerHTML = "<input type='text' id ='price" + count + "' name='price' value='0' oninput='changeSubtotal("+count+")' />";
+        price.innerHTML = "<input type='text' id ='price" + count + "' name='price["+count+"]' value='0' oninput='changeSubtotal("+count+")' />";
 
         tr.appendChild(price);
     }
 
     function qtyText(tr) {
         var qty = document.createElement("td");
-        qty.innerHTML = "<input type='text' id ='qty" + count + "' name='qty' value='1' oninput='changeSubtotal("+count+")' />";
+        qty.innerHTML = "<input type='text' id ='qty" + count + "' name='qty["+count+"]' value='1' oninput='changeSubtotal("+count+")' />";
 
         tr.appendChild(qty);
     }
@@ -317,7 +317,7 @@
 
     function changeTotal(){
         var total = document.getElementById("total");
-        var shipCost = document.getElementById("shipCost");
+        var shipCost = document.getElementById("shipCost").value;
 
         total = 0;
         var length = document.getElementById("orderDetailTable").rows.length-1;
@@ -325,9 +325,24 @@
         for(var i=0;i<length;i++){
             subtotalSum = subtotalSum +  document.getElementsByName("subtotal")[i].value;
         }
-        total.value = subtotalSum - shipCost.value;
+        total.value = subtotalSum - shipCost;
     }
 
+    function delOrder(orderId) {
+
+        $.ajax({
+            type: "GET",
+            url: "/Order/delete",
+            data: {
+                orderId: orderId
+            },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (msg) {
+                alert("新增成功");
+            }
+        });
+    }
 
 </script>
 
