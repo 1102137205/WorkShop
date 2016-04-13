@@ -166,7 +166,7 @@ namespace WorkShop.Controllers
 
             foreach (var tmp in orderDetail)
             {
-                total = total + tmp.Qty * Convert.ToDouble(tmp.UnitPrice) - Convert.ToDouble(tmp.Discount);
+                total = total + tmp.Qty * Convert.ToDouble(tmp.UnitPrice);
             }
 
             total = Math.Round(total + Convert.ToDouble(data.Freight));
@@ -361,25 +361,13 @@ namespace WorkShop.Controllers
             return RedirectToAction("Index");
         }
 
-        public String delete(int orderId) {
+        public void delete(int orderId) {
             Orders order = db.Orders.Find(orderId);
             List<OrderDetails> orderDetail = db.OrderDetails.Where(x => x.OrderID == orderId).ToList();
 
-            String status = "";
-
-            try
-            {
-                db.Orders.Remove(order);
-                db.OrderDetails.RemoveRange(orderDetail);
-                db.SaveChanges();
-                status = "刪除成功";
-            }
-            catch {
-                status = "刪除失敗";
-            }
-
-
-            return status;
+            db.Orders.Remove(order);
+            db.OrderDetails.RemoveRange(orderDetail);
+            db.SaveChanges();
         }
 
     }

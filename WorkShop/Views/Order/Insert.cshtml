@@ -67,7 +67,7 @@
             </tr>
             <tr>
                 <th>運費</th>
-                <td colspan="3"><input type="text" name="shipCost" /></td>
+                <td colspan="3"><input type="text" name="shipCost" id="shipCost" oninput="changeTotal()" value="0" /></td>
             </tr>
             <tr>
                 <th>出貨國家</th>
@@ -89,7 +89,7 @@
             </tr>
             <tr>
                 <th>訂單金額總計</th>
-                <td colspan="3"><input type="text"></td>
+                <td colspan="3"><input type="text" id="total" value="0"></td>
             </tr>
             <tr>
                 <th></th>
@@ -250,17 +250,22 @@
         changeTotal();
     }
 
-    function changeTotal(){
-        var total = document.getElementById("total");
+    function changeTotal() {
+        var value = 0;
+        var subValue = 0;
         var shipCost = document.getElementById("shipCost");
 
-        total = 0;
-        var length = document.getElementById("orderDetailTable").rows.length-1;
-        var subtotalSum = 0;
-        for(var i=0;i<length;i++){
-            subtotalSum = subtotalSum +  document.getElementsByName("subtotal")[i].value;
+        var length = document.getElementById("orderDetailTable").rows.length - 1;
+
+        for (var i = 0; i < length; i++) {
+            subValue = document.getElementsByName("subtotal")[i].value;
+            value = Number(value) + Number(subValue);
+            console.log(value);
         }
-        total.value = subtotalSum - shipCost.value;
+        value += Number(shipCost.value);
+        document.getElementById("total").value = Math.round(value);
     }
+
+
 </script>
 

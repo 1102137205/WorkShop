@@ -7,6 +7,7 @@
 <html>
 
 <body>
+    <input type="button" value="回前頁" onclick="goback()" />
     <table id="searchTable" border="1" style="width:100%" border-collapse="collapse">
         <tr>
             <th>訂單編號</th>
@@ -26,9 +27,7 @@
                     <td>@item.ShippedDate</td>
                     <td>
                         <a href="/Order/update?orderId=@item.OrderID"><input type="button" value="修改" /></a>
-                        @using(Html.BeginForm("delete","Order",FormMethod.Get)){
-                            <a href=""><input type="button" id="@item.OrderID" name="cancelButton" value="刪除" /></a>
-                        }
+                        <input type="button" name="cancelButton" value="刪除" onclick="delOrder('@item.OrderID')" />
                     </td>
                 </tr>
             }
@@ -48,5 +47,25 @@
         }
         orderDetailTable.deleteRow(num);
         count--;
+    }
+
+    function delOrder(orderId) {
+
+        $.ajax({
+            type: "GET",
+            url: "/Order/delete",
+            data: {
+                orderId: orderId
+            },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+        });
+
+        alert("刪除成功");
+        document.location.reload();
+    }
+
+    function goback() {
+        history.back();
     }
 </script>

@@ -95,9 +95,9 @@
             <tr>
                 <th></th>
                 <td colspan="3">
-                    <input type="submit" value="存檔">
+                    <input type="submit" value="存檔" >
                     <input type="button" value="刪除本筆訂單" onclick="delOrder('@ViewBag.OrderData.OrderID')">
-                    <a href="/Order/search?employee=00&ship=00"><input type="button" value="取消"></a>
+                    <input type="button" value="取消" onclick="goback()">
                 </td>
             </tr>
 
@@ -303,6 +303,8 @@
                 subtotal.value = Math.round(msg * qty.value);
             }
         });
+
+
     }
 
     //修改單價或數量改變小計
@@ -316,16 +318,17 @@
     }
 
     function changeTotal(){
-        var total = document.getElementById("total");
-        var shipCost = document.getElementById("shipCost").value;
+        var value = 0;
+        var shipCost = document.getElementById("shipCost");
 
         total = 0;
         var length = document.getElementById("orderDetailTable").rows.length-1;
-        var subtotalSum = 0;
+
         for(var i=0;i<length;i++){
-            subtotalSum = subtotalSum +  document.getElementsByName("subtotal")[i].value;
+            value = Number(value) + Number(document.getElementsByName("subtotal")[i].value);
         }
-        total.value = subtotalSum - shipCost;
+        value += Number(shipCost.value);
+        document.getElementById("total").value = Math.round(value);
     }
 
     function delOrder(orderId) {
@@ -338,10 +341,14 @@
             },
             contentType: "application/json; charset=utf-8",
             dataType: "json",
-            success: function (msg) {
-                alert("新增成功");
-            }
         });
+
+        alert("刪除成功");
+        document.location.href="/Order/Index";
+    }
+
+    function goback(){
+        history.back();
     }
 
 </script>
