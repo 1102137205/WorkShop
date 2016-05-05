@@ -17,7 +17,7 @@ namespace WorkShop.Models
         [Key]
         public int ProductID { get; set; }
 
-        [Required]
+        
         [StringLength(40)]
         public string ProductName { get; set; }
 

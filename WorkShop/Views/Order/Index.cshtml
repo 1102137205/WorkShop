@@ -11,7 +11,7 @@
     @using (Html.BeginForm("Index", "Order", FormMethod.Post))
     {
 
-        <table border="1" style="width:100%" border-collapse="collapse">
+        <table border="1" style="width:100%" border-collapse="collapse" class="table table-bordered">
             <tr>
                 <th>訂單編號</th>
                 <td colspan="3"><input type="text" name="orderId"></td>
@@ -61,14 +61,14 @@
             </tr>
             <tr>
                 <th>需要日期</th>
-                <td colspan="3"><input type="date" name="needDate"/></td>
+                <td colspan="3"><input type="date" name="needDate" /></td>
             </tr>
             <tr>
                 <th></th>
                 <td colspan="3">
-                    <input type="submit" value="查詢">
-                    <input type="reset" value="清除">
-                    <a href="/Order/Insert"><input type="button" value="新增訂單"></a>
+                    <input type="submit" value="查詢" class="btn btn-info" />
+                    <input type="reset" value="清除" class="btn btn-warning" />
+                    <a href="/Order/Insert"><input type="button" value="新增訂單" class="btn btn-primary" /></a>
                 </td>
             </tr>
         </table>

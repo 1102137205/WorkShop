@@ -336,26 +336,28 @@ namespace WorkShop.Controllers
 
             int count = 0;
 
-            for (int i = 1; i < inputs.Count;i++)
+            for (int i = 1; i < inputs.Count; i++)
             {
-                if (inputs.AllKeys.Contains("productName["+i+"]")) {
+                if (inputs.AllKeys.Contains("productName[" + i + "]"))
+                {
                     count++;
                 }
             }
 
-            for (int i = 1; i <= count; i++) {
+            for (int i = 1; i <= count; i++)
+            {
                 OrderDetails dataDetail = new OrderDetails();
 
                 dataDetail.OrderID = data.OrderID;
-                dataDetail.ProductID = Convert.ToInt32(inputs["productName["+i+"]"]);
+                dataDetail.ProductID = Convert.ToInt32(inputs["productName[" + i + "]"]);
                 dataDetail.UnitPrice = Convert.ToDecimal(inputs["price[" + i + "]"]);
                 dataDetail.Qty = Convert.ToInt16(inputs["qty[" + i + "]"]);
-
+                dataDetail.Orders = data;
                 data.OrderDetails.Add(dataDetail);
 
             }
 
-            
+
             db.SaveChanges();
 
             return RedirectToAction("Index");
