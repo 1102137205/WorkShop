@@ -67,7 +67,7 @@
             </tr>
             <tr>
                 <th>運費</th>
-                <td colspan="3"><input type="text" class="num" name="shipCost" id="shipCost" oninput="changeTotal()" value="0" /></td>
+                <td colspan="3"><input type="text" class="num" name="shipCost" id="shipCost" oninput="changeTotal()" value="0" style="direction:rtl" /></td>
             </tr>
             <tr>
                 <th>出貨國家</th>
@@ -79,7 +79,7 @@
                 <th>出貨地區</th>
                 <td><input type="text" class="text" name="shipRegion" /></td>
                 <th>郵遞區號</th>
-                <td><input type="text" class="num" name="shipAddressNo" /></td>
+                <td><input type="text" class="text" name="shipAddressNo" style="direction:rtl" /></td>
             </tr>
             <tr>
                 <th>出貨地址</th>
@@ -89,7 +89,7 @@
             </tr>
             <tr>
                 <th>訂單金額總計</th>
-                <td colspan="3"><input type="text" class="num" id="total" value="0"></td>
+                <td colspan="3"><input type="text" class="num" id="total" value="0" style="direction:rtl"></td>
             </tr>
             <tr>
                 <th></th>
@@ -129,10 +129,13 @@
             min: 10248,
         });
         $(".num").kendoNumericTextBox({
-            format: "#.##",
+            format: "c2",
             min: 1,
         });
-        $(".dropdown").kendoDropDownList();
+        $(".dropdown").kendoComboBox({
+            filter: "contains",
+            suggest: true,
+        });
         $(".date").kendoDatePicker({
             format: "yyyy/MM/dd",
             animation: {
@@ -173,35 +176,29 @@
     function priceText(tr) {
         var price = document.createElement("td");
         price.setAttribute("id", price);
-        price.innerHTML = "<input type='text' id ='price" + count + "' name='price["+count+"]' value='0' oninput='changeSubtotal("+count+")' />";
+        price.innerHTML = "<input type='text' id ='price" + count + "' name='price[" + count + "]' value='0' oninput='changeSubtotal(" + count + ")' style='direction:rtl' />";
 
         tr.appendChild(price);
     }
 
     function qtyText(tr) {
         var qty = document.createElement("td");
-        qty.innerHTML = "<input type='text' id ='qty" + count + "' name='qty["+count+"]' value='1' oninput='changeSubtotal("+count+")' />";
+        qty.innerHTML = "<input type='text' id ='qty" + count + "' name='qty[" + count + "]' value='1' oninput='changeSubtotal(" + count + ")' style='direction:rtl' />";
 
         tr.appendChild(qty);
     }
 
     function subtotalText(tr) {
         var subtotal = document.createElement("td");
-        subtotal.innerHTML = "<input type='text' id ='subtotal" + count + "' name='subtotal' value='0' disabled />";
+        subtotal.innerHTML = "<input type='text' id ='subtotal" + count + "' name='subtotal' value='0' style='direction:rtl' disabled />";
 
         tr.appendChild(subtotal);
     }
 
     function cancelButton(tr) {
         var cancle = document.createElement("td");
+        cancle.innerHTML = "<input type='button' id ='" + count + "' class='btn btn-primary' onclick='delRow(" + count + ")' value='刪除'/>";
 
-        var button = document.createElement("button");
-
-        button.innerText = "刪除";
-        button.setAttribute("id", count);
-        button.setAttribute("onclick", "delRow(" + count + ")");
-
-        cancle.appendChild(button);
         tr.appendChild(cancle);
     }
 
@@ -224,9 +221,6 @@
     function delRow(num) {
         var orderDetailTable = document.getElementById("orderDetailTable");
 
-        if (num != count) {
-            num++;
-        }
         orderDetailTable.deleteRow(num);
         count--;
     }

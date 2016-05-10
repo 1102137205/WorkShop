@@ -8,71 +8,69 @@
 <html>
 
 <body>
-    @using (Html.BeginForm("Index", "Order", FormMethod.Post))
-    {
-        <table id="searchTable" border="1" style="width:100%" border-collapse="collapse" class="table table-bordered">
-            <tr>
-                <td>訂單編號</td>
-                <td colspan="3"><input type="text" id="orderid" name="orderId" placeholder="請輸入訂單編號"></td>
-            </tr>
-            <tr>
-                <td>客戶名稱</td>
-                <td colspan="3"><input type="text" class="text" name="custName" placeholder="請輸入客戶姓名" /></td>
-            </tr>
-            <tr>
-                <td>負責員工</td>
-                <td colspan="3">
-                    <select name="employee" class="dropdown">
-                        <option value="00">請選擇負責員工</option>
-                        @if (ViewBag.emName != null)
+    <table id="searchTable" border="1" style="width:100%" border-collapse="collapse" class="table table-bordered">
+        <tr>
+            <td>訂單編號</td>
+            <td colspan="3"><input type="text" id="orderid" name="orderId" placeholder="請輸入訂單編號"></td>
+        </tr>
+        <tr>
+            <td>客戶名稱</td>
+            <td colspan="3"><input type="text" id="custName" class="text" name="custName" placeholder="請輸入客戶姓名"/></td>
+        </tr>
+        <tr>
+            <td>負責員工</td>
+            <td colspan="3">
+                <select name="employee" class="dropdown">
+                    <option value="00">請選擇負責員工</option>
+                    @if (ViewBag.emName != null)
+                    {
+                        foreach (var tmp in (List<String>)ViewBag.emName)
                         {
-                            foreach (var tmp in (List<String>)ViewBag.emName)
-                            {
-                                <option>@tmp</option>
-                            }
+                            <option>@tmp</option>
                         }
+                    }
 
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td>出貨公司</td>
-                <td colspan="3">
-                    <select name="ship" class="dropdown">
-                        <option value="00">請選擇出貨公司</option>
-                        @if (ViewBag.coName != null)
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>出貨公司</td>
+            <td colspan="3">
+                <select name="ship" class="dropdown">
+                    <option value="00">請選擇出貨公司</option>
+                    @if (ViewBag.coName != null)
+                    {
+                        foreach (var tmp in (List<String>)ViewBag.coName)
                         {
-                            foreach (var tmp in (List<String>)ViewBag.coName)
-                            {
-                                <option>@tmp</option>
-                            }
+                            <option>@tmp</option>
                         }
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td>訂購日期</td>
-                <td><input type="date" class="date" name="orderDate" /></td>
+                    }
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>訂購日期</td>
+            <td><input type="date" class="date" name="orderDate" /></td>
 
-                <td>出貨日期</td>
-                <td><input type="date" class="date" name="shipDate" /></td>
+            <td>出貨日期</td>
+            <td><input type="date" class="date" name="shipDate" /></td>
 
-            </tr>
-            <tr>
-                <td>需要日期</td>
-                <td colspan="3"><input type="date" class="date" name="needDate" /></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td colspan="3">
-                    <input type="submit" value="查詢" class="btn btn-info" />
-                    <input type="reset" value="清除" class="btn btn-warning" />
-                    <a href="/Order/Insert"><input type="button" value="新增訂單" class="btn btn-primary" /></a>
-                </td>
-            </tr>
-        </table>
-    } 
+        </tr>
+        <tr>
+            <td>需要日期</td>
+            <td colspan="3"><input type="date" class="date" name="needDate" /></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td colspan="3">
+                <input type="submit" value="查詢" class="btn btn-info" onclick="search()" />
+                <input type="reset" value="清除" class="btn btn-warning" />
+                <a href="/Order/Insert"><input type="button" value="新增訂單" class="btn btn-primary" /></a>
+            </td>
+        </tr>
+    </table>
 
+    <div id="result"></div>
 </body>
 
 </html>
@@ -85,7 +83,10 @@
             format: "#",
             min: 10248,
         });
-        $(".dropdown").kendoDropDownList();
+        $(".dropdown").kendoComboBox({
+            filter: "contains",
+            suggest: true,
+        });
         $(".date").kendoDatePicker({
             format: "yyyy/MM/dd",
             animation: {
@@ -101,6 +102,90 @@
         });
         $(".btn").kendoButton();
     })
+
+    function search() {
+
+        var id =  $("#orderid").val();
+
+        var dataSrc = $.ajax({
+            type: 'POST',
+            url: '/Order/Index',
+            dataType: 'json',
+            data: { orderId: id },
+        })
+        @*var dataSrc = new kendo.data.DataSource({
+            transport: {
+                read: {
+                    以下其實就是$.ajax的參數
+                    type: "POST",
+                    url: "@Url.Action("/Index")",
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    data: {
+                        額外傳至後方的參數
+                        orderId:id,
+
+
+                    }
+                }
+            },
+            schema: {
+                model: {
+                    fields: {
+                        orderId: { type: "int" },
+                    }
+                },
+                取出資料陣列
+                data: function (d) { return d.Data; },
+                取出資料總筆數(計算頁數用)
+                total: function (d) { return d.TotalCount; }
+            },
+            pageSize: 10,
+            serverPaging: true,
+            serverSorting: true
+        });*@
+
+        $("#dvGrid").kendoGrid({
+            dataSource: dataSrc,
+            columns: [
+                {
+                    field: "orderId", title: "訂單編號",
+                },
+                {
+                    field: "custName", title: "客戶名稱",
+                },
+                {
+                    field: "orderDate", title: "訂購日期",
+                },
+                {
+                    field: "shipDate", title: "發貨日期",
+                }
+            ],
+            sortable: true,
+            pageable: true,
+            dataBound: function () {
+
+                document.location.href = "/Order/search";
+
+                ////AJAX資料Bind完成後觸發
+                //var kw = $("#tKeyword").val();
+                ////若有設關鍵字，做Highlight處理
+                //if (kw.length > 0) {
+                //    var re = new RegExp(kw, "g");
+                //    $(".u-name").each(function () {
+                //        var $td = $(this);
+                //        $td.html($td.text()
+                //       .replace(re, "<span class='hi-lite'>$&</span>"));
+                //    });
+                //}
+            },
+            dataBinding: function (e) {
+                console.log(e);
+            }
+        });
+    }
+
+    
 </script>
 
 

@@ -6,7 +6,7 @@
 <h2>訂單修改</h2>
 
 <html>
-<body>
+<body onload="loadTable()">
     @using (Html.BeginForm("update", "Order", FormMethod.Post))
     {
         <table border="1" style="width:100%" border-collapse="collapse" class="table table-bordered">
@@ -45,13 +45,13 @@
             </tr>
             <tr>
                 <th>訂單日期</th>
-                <td><input type="date" name="orderDate" class="date" value="@ViewBag.OrderDate" /></td>
+                <td><input type="date" name="orderDate" id="orderDate" class="date" value="@ViewBag.OrderDate" /></td>
                 <th>需要日期</th>
-                <td><input type="date" name="needDate" class="date" value="@ViewBag.RequiredDate" /></td>
+                <td><input type="date" name="needDate" id="needDate" class="date" value="@ViewBag.RequiredDate" /></td>
             </tr>
             <tr>
                 <th>出貨日期</th>
-                <td colspan="3"><input type="date" class="date" name="shipDate" value="@ViewBag.ShippedDate" /></td>
+                <td colspan="3"><input type="date" id="shipDate" class="date" name="shipDate" value="@ViewBag.ShippedDate" /></td>
             </tr>
             <tr>
                 <th>出貨公司名稱</th>
@@ -68,7 +68,7 @@
             </tr>
             <tr>
                 <th>運費</th>
-                <td colspan="3"><input type="text" class="num" id="shipCost" name="shipCost" value="@ViewBag.OrderData.Freight" oninput="changeTotal()" /></td>
+                <td colspan="3"><input type="text" class="num" id="shipCost" name="shipCost" value="@ViewBag.OrderData.Freight" oninput="changeTotal()" style="direction:rtl" /></td>
             </tr>
             <tr>
                 <th>出貨國家</th>
@@ -80,7 +80,7 @@
                 <th>出貨地區</th>
                 <td><input type="text" class="text" name="shipRegion" value="@ViewBag.OrderData.ShipRegion" /></td>
                 <th>郵遞區號</th>
-                <td><input type="text" class="num" name="shipAddressNo" value="@ViewBag.OrderData.ShipPostalCode" /></td>
+                <td><input type="text" id="addressNo" name="shipAddressNo" value="@ViewBag.OrderData.ShipPostalCode" style="direction:rtl" /></td>
             </tr>
             <tr>
                 <th>出貨地址</th>
@@ -90,7 +90,7 @@
             </tr>
             <tr>
                 <th>訂單金額總計</th>
-                <td colspan="3"><input type="text" class="num" id="total" value="@ViewBag.total" disabled></td>
+                <td colspan="3"><input type="text" class="num" id="total" value="@ViewBag.total" style="direction:rtl" disabled></td>
             </tr>
             <tr>
                 <th></th>
@@ -103,54 +103,25 @@
 
         </table>
 
-        <br/>
+        <br />
         <h5>訂單明細</h5>
 
-    <input type="button" value="新增訂單" onclick="addRow()" class="btn btn-default" />
+        <input type="button" value="新增訂單" onclick="addRow()" class="btn btn-default" />
 
-    <table id="orderDetailTable" border="1" style="width:100%" class="table table-bordered">
-        <tr>
-            <th>商品</th>
-            <th>單價</th>
-            <th>數量</th>
-            <th>小計</th>
-            <th></th>
-        </tr>
-    </table>
+        <table id="orderDetailTable" border="1" style="width:100%" class="table table-bordered">
+            <tr>
+                <th>商品</th>
+                <th>單價</th>
+                <th>數量</th>
+                <th>小計</th>
+                <th></th>
+            </tr>
+        </table>
     }
+   
 </body>
 </html>
 <script type="text/javascript">
-
-    $(document).ready(function () {
-
-        loadTable();
-
-        $(".text").kendoMaskedTextBox();
-        $("#orderid").kendoNumericTextBox({
-            format: "#",
-            min: 10248,
-        });
-        $(".num").kendoNumericTextBox({
-            min: 1,
-        });
-        $(".dropdown").kendoDropDownList();
-        $(".date").kendoDatePicker({
-            format: "yyyy/MM/dd",
-            animation: {
-                close: {
-                    effects: "fadeOut zoom:out",
-                    duration: 300
-                },
-                open: {
-                    effects: "fadeIn zoom:in",
-                    duration: 300
-                }
-            }
-        });
-        $(".btn").kendoButton();
-
-    })
 
     //table row length
     var count = document.getElementById("orderDetailTable").rows.length - 1;
@@ -178,34 +149,26 @@
             foreach (var tmp in (List<WorkShop.Models.Products>)ViewBag.ProductData)
             {
                 @: select.appendChild(new Option("@tmp.ProductName", "@tmp.ProductID"));
-                            }
+            }
 
             @:product.appendChild(select);
 
             //pricetext
             @:var price = document.createElement("td");
-                            @:price.innerHTML = "<input type='text' class='num' id ='price" + count + "' name='price["+count+"]' value = '@item.UnitPrice' oninput='changeSubtotal("+count+")' onchange='changeSubtotal("+count+")'/>";
+                            @:price.innerHTML = "<input type='text' class='num' id ='price" + count + "' name='price["+count+"]' value = '@item.UnitPrice' oninput='changeSubtotal("+count+")' onchange='changeSubtotal("+count+")' style='direction:rtl'/>";
 
             //qtytext
             @:var qty = document.createElement("td");
-                            @:qty.innerHTML = "<input type='text' class='num' id='qty"+count+"' name='qty["+count+"]' value='@item.Qty' oninput='changeSubtotal("+count+")' onchange='changeSubtotal("+count+")'/>";
+                            @:qty.innerHTML = "<input type='text' class='num' id='qty"+count+"' name='qty["+count+"]' value='@item.Qty' oninput='changeSubtotal("+count+")' onchange='changeSubtotal("+count+")' style='direction:rtl'/>";
 
             //subtotaltext
             @:var sum = @item.UnitPrice * @item.Qty;
                             @:var subtotal = document.createElement("td");
-                            @:subtotal.innerHTML = "<input type='text' class='text' id='subtotal" + count + "' name='subtotal' value='"+sum+"' onchange='changeTotal()' disabled />";
+                            @:subtotal.innerHTML = "<input type='text' class='text' id='subtotal" + count + "' name='subtotal' value='"+sum+"' onchange='changeTotal()' style='direction:rtl' disabled />";
 
             //cancelbutton
             @:var cancle = document.createElement("td");
-                            @:var button = document.createElement("button");
-
-            @:button.innerText = "刪除";
-                            @:button.setAttribute("id", count);
-                            @:button.setAttribute("onclick", "delRow(" + count + ")");
-                            @:button.setAttribute("class", "btn btn-primary");
-
-            @:cancle.appendChild(button);
-
+            @:cancle.innerHTML = "<input type='button' id ='" + count + "' class='btn btn-primary' onclick='delRow(" + count + ")' value='刪除'/>";
 
             @:tr.appendChild(product);
                             @:tr.appendChild(price);
@@ -215,7 +178,36 @@
                             @:tableObjs.appendChild(tr);
                         }
 
+        $(".text").kendoMaskedTextBox();
+        $("#addressNo").kendoMaskedTextBox();
+        $("#orderid").kendoNumericTextBox({
+            format: "#",
+            min: 10248,
+        });
+        $(".num").kendoNumericTextBox({
+            format:"c2",
+            min: 1,
+        });
+        $(".dropdown").kendoComboBox({
+            filter: "contains",
+            suggest: true,
+        });
 
+        $(".date").kendoDatePicker({
+            format: "yyyy/MM/dd",
+            animation: {
+                close: {
+                    effects: "fadeOut zoom:out",
+                    duration: 300
+                },
+                open: {
+                    effects: "fadeIn zoom:in",
+                    duration: 300
+                }
+            }
+        });
+
+        $(".btn").kendoButton();
 
     }
 
@@ -243,36 +235,29 @@
     function priceText(tr) {
         var price = document.createElement("td");
         price.setAttribute("id", price);
-        price.innerHTML = "<input type='text' id ='price" + count + "' class='num' name='price["+count+"]' value='0' oninput='changeSubtotal("+count+")' onchange='changeSubtotal("+count+")' />";
+        price.innerHTML = "<input type='text' id ='price" + count + "' class='num' name='price["+count+"]' value='0' oninput='changeSubtotal("+count+")' onchange='changeSubtotal("+count+")' style='direction:rtl' />";
 
         tr.appendChild(price);
     }
 
     function qtyText(tr) {
         var qty = document.createElement("td");
-        qty.innerHTML = "<input type='text' id ='qty" + count + "' class='num' name='qty["+count+"]' value='1' oninput='changeSubtotal("+count+")' onchange='changeSubtotal("+count+")' />";
+        qty.innerHTML = "<input type='text' id ='qty" + count + "' class='num' name='qty["+count+"]' value='1' oninput='changeSubtotal("+count+")' onchange='changeSubtotal("+count+")' style='direction:rtl' />";
 
         tr.appendChild(qty);
     }
 
     function subtotalText(tr) {
         var subtotal = document.createElement("td");
-        subtotal.innerHTML = "<input type='text' id ='subtotal" + count + "' class='text' name='subtotal' value='0' disabled />";
+        subtotal.innerHTML = "<input type='text' id ='subtotal" + count + "' class='text' name='subtotal' value='0' style='direction:rtl' disabled />";
 
         tr.appendChild(subtotal);
     }
 
     function cancelButton(tr) {
         var cancle = document.createElement("td");
+        cancle.innerHTML = "<input type='button' id ='" + count + "' class='btn btn-primary' onclick='delRow(" + count + ")' value='刪除'/>";
 
-        var button = document.createElement("button");
-
-        button.innerText = "刪除";
-        button.setAttribute("id", count);
-        button.setAttribute("onclick", "delRow(" + count + ")");
-        button.setAttribute("class", "btn btn-primary");
-
-        cancle.appendChild(button);
         tr.appendChild(cancle);
     }
 
@@ -297,9 +282,6 @@
     function delRow(num) {
         var orderDetailTable = document.getElementById("orderDetailTable");
 
-        if (num != count) {
-            num++;
-        }
         orderDetailTable.deleteRow(num);
         count--;
         changeTotal();

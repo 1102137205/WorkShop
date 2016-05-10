@@ -46,65 +46,7 @@
 
         $(".btn").kendoButton();
 
-        var dataSrc = new kendo.data.DataSource({
-            transport: {
-                read: {
-                    //以下其實就是$.ajax的參數
-                    type: "POST",
-                    url: "Index",
-                    dataType: "json",
-                    data: {
-                        //額外傳至後方的參數
-                    }
-                }
-            },
-            schema: {
-                //取出資料陣列
-                data: function (d) { return d.Data; },
-                //取出資料總筆數(計算頁數用)
-                total: function (d) { return d.TotalCount; }
-            },
-            pageSize: 10,
-            serverPaging: true,
-            serverSorting: true
-        });
-
-        $("#dvGrid").kendoGrid({
-            dataSource: dataSrc,
-            columns: [
-                {
-                    field: "orderId", title: "訂單編號",
-                    template : '#=kendo.toString(OrderId) #'
-                },
-                {
-                    field: "custName", title: "客戶名稱",
-                    template: '#= Kendo.toString(CustName) #'
-                },
-                {
-                    field: "orderDate", title: "訂購日期",
-                    template: '#= kendo.toString(toDate(OrderDate), "yyyy/MM/dd")#'
-                },
-                {
-                    field: "shipDate", title: "發貨日期",
-                    template: '#= kendo.toString(toDate(shipDate), "yyyy/MM/dd")#'
-                }
-            ],
-            sortable: true,
-            pageable: true,
-            dataBound: function () {
-                //AJAX資料Bind完成後觸發
-                var kw = $("#tKeyword").val();
-                //若有設關鍵字，做Highlight處理
-                if (kw.length > 0) {
-                    var re = new RegExp(kw, "g");
-                    $(".u-name").each(function () {
-                        var $td = $(this);
-                        $td.html($td.text()
-                       .replace(re, "<span class='hi-lite'>$&</span>"));
-                    });
-                }
-            }
-        });
+        
     })
 
     function delRow(num) {
