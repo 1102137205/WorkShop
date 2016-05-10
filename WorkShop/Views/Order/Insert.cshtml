@@ -13,13 +13,13 @@
             <tr>
                 <th>訂單編號</th>
                 <td colspan="3">
-                    <input type="text" name="orderId" value="@ViewBag.orderId" readonly="readonly" required>
+                    <input type="text" name="orderId" id="orderid" value="@ViewBag.orderId" readonly="readonly" required>
                 </td>
             </tr>
             <tr>
                 <th>客戶名稱</th>
                 <td colspan="3">
-                    <select name="custName" required>
+                    <select name="custName" class="dropdown" required>
                         <option value="">請選擇客戶名稱</option>
 
                         @foreach (var item in (List<WorkShop.Models.Customers>)ViewBag.customer)
@@ -32,7 +32,7 @@
             <tr>
                 <th>負責員工名稱</th>
                 <td colspan="3">
-                    <select name="employeeName" required>
+                    <select name="employeeName" class="dropdown" required>
                         <option value="">請選擇負責員工名稱</option>
 
                         @foreach (var item in (List<WorkShop.Models.Employees>)ViewBag.employee)
@@ -44,18 +44,18 @@
             </tr>
             <tr>
                 <th>訂單日期</th>
-                <td><input type="date" name="orderDate" required /></td>
+                <td><input type="date" class="date" name="orderDate" required /></td>
                 <th>需要日期</th>
-                <td><input type="date" name="needDate" required /></td>
+                <td><input type="date" class="date" name="needDate" required /></td>
             </tr>
             <tr>
                 <th>出貨日期</th>
-                <td colspan="3"><input type="date" name="shipDate" required /></td>
+                <td colspan="3"><input type="date" class="date" name="shipDate" required /></td>
             </tr>
             <tr>
                 <th>出貨公司名稱</th>
                 <td colspan="3">
-                    <select name="shipCompanyName" required>
+                    <select name="shipCompanyName" class="dropdown" required>
                         <option value="">請選擇出貨公司名稱</option>
 
                         @foreach (var item in (List<WorkShop.Models.Shippers>)ViewBag.ShipCompany)
@@ -67,35 +67,35 @@
             </tr>
             <tr>
                 <th>運費</th>
-                <td colspan="3"><input type="text" name="shipCost" id="shipCost" oninput="changeTotal()" value="0" /></td>
+                <td colspan="3"><input type="text" class="num" name="shipCost" id="shipCost" oninput="changeTotal()" value="0" /></td>
             </tr>
             <tr>
                 <th>出貨國家</th>
-                <td><input type="text" name="shipCountry" /></td>
+                <td><input type="text" class="text" name="shipCountry" /></td>
                 <th>出貨城市</th>
-                <td><input type="text" name="shipCity" /></td>
+                <td><input type="text" class="text" name="shipCity" /></td>
             </tr>
             <tr>
                 <th>出貨地區</th>
-                <td><input type="text" name="shipRegion" /></td>
+                <td><input type="text" class="text" name="shipRegion" /></td>
                 <th>郵遞區號</th>
-                <td><input type="text" name="shipAddressNo" /></td>
+                <td><input type="text" class="num" name="shipAddressNo" /></td>
             </tr>
             <tr>
                 <th>出貨地址</th>
-                <td><input type="text" name="shipAddress" /></td>
+                <td><input type="text" class="text" name="shipAddress" /></td>
                 <th>出貨說明</th>
-                <td><input type="text" name="shipDesc" /></td>
+                <td><input type="text" class="text" name="shipDesc" /></td>
             </tr>
             <tr>
                 <th>訂單金額總計</th>
-                <td colspan="3"><input type="text" id="total" value="0"></td>
+                <td colspan="3"><input type="text" class="num" id="total" value="0"></td>
             </tr>
             <tr>
                 <th></th>
                 <td colspan="3">
-                    <input type="submit" value="存檔">
-                    <a href="/Order/Index"><input type="button" value="取消"></a>
+                    <input type="submit" value="存檔" class="btn btn-primary">
+                    <a href="/Order/Index"><input type="button" value="取消" class="btn btn-warning"></a>
                 </td>
             </tr>
 
@@ -104,22 +104,50 @@
         <br />
         <h5>訂單明細</h5>
 
-        <input type="button" value="新增訂單" onclick="addRow()" />
+    <input type="button" value="新增訂單" onclick="addRow()" class="btn btn-default" />
 
-        <table id="orderDetailTable" border="1" style="width:100%">
-            <tr>
-                <th>商品</th>
-                <th>單價</th>
-                <th>數量</th>
-                <th>小計</th>
-                <th></th>
-            </tr>
-        </table>
+    <table id="orderDetailTable" border="1" style="width:100%" class="table table-bordered">
+        <tr>
+            <th>商品</th>
+            <th>單價</th>
+            <th>數量</th>
+            <th>小計</th>
+            <th></th>
+        </tr>
+    </table>
     }
 </body>
 </html>
 
 <script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $(".text").kendoMaskedTextBox();
+        $("#orderid").kendoNumericTextBox({
+            format: "#",
+            min: 10248,
+        });
+        $(".num").kendoNumericTextBox({
+            format: "#.##",
+            min: 1,
+        });
+        $(".dropdown").kendoDropDownList();
+        $(".date").kendoDatePicker({
+            format: "yyyy/MM/dd",
+            animation: {
+                close: {
+                    effects: "fadeOut zoom:out",
+                    duration: 300
+                },
+                open: {
+                    effects: "fadeIn zoom:in",
+                    duration: 300
+                }
+            }
+        });
+        $(".btn").kendoButton();
+    })
 
     var count = document.getElementById("orderDetailTable").rows.length - 1;
 
@@ -130,7 +158,7 @@
         select.setAttribute("id", "product" + count);
         select.setAttribute("onchange", "changeProduct('product" + count + "')");
         select.setAttribute("name", "productName["+count+"]");
-
+        select.setAttribute("class", "dropdown");
         select.appendChild(new Option("請選擇商品", ""));
 
         @foreach (var item in (List<WorkShop.Models.Products>)ViewBag.ProductData)

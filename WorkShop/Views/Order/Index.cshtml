@@ -10,20 +10,19 @@
 <body>
     @using (Html.BeginForm("Index", "Order", FormMethod.Post))
     {
-
-        <table border="1" style="width:100%" border-collapse="collapse" class="table table-bordered">
+        <table id="searchTable" border="1" style="width:100%" border-collapse="collapse" class="table table-bordered">
             <tr>
-                <th>訂單編號</th>
-                <td colspan="3"><input type="text" name="orderId"></td>
+                <td>訂單編號</td>
+                <td colspan="3"><input type="text" id="orderid" name="orderId" placeholder="請輸入訂單編號"></td>
             </tr>
             <tr>
-                <th>客戶名稱</th>
-                <td colspan="3"><input type="text" name="custName" /></td>
+                <td>客戶名稱</td>
+                <td colspan="3"><input type="text" class="text" name="custName" placeholder="請輸入客戶姓名" /></td>
             </tr>
             <tr>
-                <th>負責員工</th>
+                <td>負責員工</td>
                 <td colspan="3">
-                    <select name="employee">
+                    <select name="employee" class="dropdown">
                         <option value="00">請選擇負責員工</option>
                         @if (ViewBag.emName != null)
                         {
@@ -37,9 +36,9 @@
                 </td>
             </tr>
             <tr>
-                <th>出貨公司</th>
+                <td>出貨公司</td>
                 <td colspan="3">
-                    <select name="ship">
+                    <select name="ship" class="dropdown">
                         <option value="00">請選擇出貨公司</option>
                         @if (ViewBag.coName != null)
                         {
@@ -52,19 +51,19 @@
                 </td>
             </tr>
             <tr>
-                <th>訂購日期</th>
-                <td><input type="date" name="orderDate" /></td>
+                <td>訂購日期</td>
+                <td><input type="date" class="date" name="orderDate" /></td>
 
-                <th>出貨日期</th>
-                <td><input type="date" name="shipDate" /></td>
+                <td>出貨日期</td>
+                <td><input type="date" class="date" name="shipDate" /></td>
 
             </tr>
             <tr>
-                <th>需要日期</th>
-                <td colspan="3"><input type="date" name="needDate" /></td>
+                <td>需要日期</td>
+                <td colspan="3"><input type="date" class="date" name="needDate" /></td>
             </tr>
             <tr>
-                <th></th>
+                <td></td>
                 <td colspan="3">
                     <input type="submit" value="查詢" class="btn btn-info" />
                     <input type="reset" value="清除" class="btn btn-warning" />
@@ -72,10 +71,36 @@
                 </td>
             </tr>
         </table>
-    }
-        
-    
+    } 
+
 </body>
 
 </html>
+
+<script>
+    $(document).ready(function () {
+
+        $(".text").kendoMaskedTextBox();
+        $("#orderid").kendoNumericTextBox({
+            format: "#",
+            min: 10248,
+        });
+        $(".dropdown").kendoDropDownList();
+        $(".date").kendoDatePicker({
+            format: "yyyy/MM/dd",
+            animation: {
+                close: {
+                    effects: "fadeOut zoom:out",
+                    duration: 300
+                },
+                open: {
+                    effects: "fadeIn zoom:in",
+                    duration: 300
+                }
+            }
+        });
+        $(".btn").kendoButton();
+    })
+</script>
+
 

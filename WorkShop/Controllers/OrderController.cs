@@ -1,9 +1,12 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Script.Serialization;
 using WorkShop.Models;
 
 namespace WorkShop.Controllers
@@ -25,44 +28,78 @@ namespace WorkShop.Controllers
             return View();
         }
 
-        [HttpPost]
-        public ActionResult Index(FormCollection inputs)
-        {
-            String orderId = inputs["orderId"];
-            String custName = inputs["custName"];
-            String employee = inputs["employee"];
-            String ship = inputs["ship"];
-            String orderDate = inputs["orderDate"];
-            String shipDate = inputs["shipDate"];
-            String needDate = inputs["needDate"];
+        //[HttpPost]
+        //public ActionResult Index(FormCollection inputs)
+        //{
 
-            return RedirectToAction("search",
-                new { orderId, custName, employee, ship , orderDate, shipDate, needDate});
+        //    String orderId = inputs["orderId"];
+        //    String custName = inputs["custName"];
+        //    String employee = inputs["employee"];
+        //    String ship = inputs["ship"];
+        //    String orderDate = inputs["orderDate"];
+        //    String shipDate = inputs["shipDate"];
+        //    String needDate = inputs["needDate"];
+
+        //    return RedirectToAction("search", new { orderId, custName, employee, ship, orderDate, shipDate, needDate });
+        //}
+
+
+        [HttpPost]
+        public JsonResult Index(FormCollection inputs)
+        {
+
+            String orderId = String.IsNullOrEmpty(inputs["orderId"]) ? "" : inputs["orderId"];
+            //String custName = String.IsNullOrEmpty(inputs["custName"]) ? "" : inputs["custName"];
+            //String employee = String.IsNullOrEmpty(inputs["employee"]) ? "" : inputs["employee"];
+            //String ship = String.IsNullOrEmpty(inputs["ship"]) ? "" : inputs["ship"];
+            //String orderDate = String.IsNullOrEmpty(inputs["orderDate"]) ? "" : inputs["orderDate"];
+            //String shipDate = String.IsNullOrEmpty(inputs["shipDate"]) ? "" : inputs["shipDate"];
+            //String needDate = String.IsNullOrEmpty(inputs["needDate"]) ? "" : inputs["needDate"];
+
+            //List<Orders> data = result(orderId, custName, employee, ship, orderDate, shipDate, needDate);
+            Orders data = db.Orders.Find(Convert.ToInt32(orderId));
+
+
+            JObject a = JObject.Parse(data.ToString());
+            JsonConvert.SerializeObject(a);
+            return ;
         }
 
-        public ActionResult search(String orderId, String custName,String employee,
+        public List<Orders> result(String orderId, String custName, String employee,
             String ship, String orderDate, String shipDate, String needDate)
         {
-
-            DateTime orderD = Convert.ToDateTime(orderDate);
+            /*DateTime orderD = Convert.ToDateTime(orderDate);
             DateTime shipD = Convert.ToDateTime(shipDate);
-            DateTime needD = Convert.ToDateTime(needDate);
+            DateTime needD = Convert.ToDateTime(needDate);*/
 
-            List<Orders> orderdata = db.Orders.Where(x =>
-                (String.IsNullOrEmpty(orderId) ? true : x.OrderID.ToString() == orderId) &&
-                (String.IsNullOrEmpty(custName) ? true : x.Customers.CompanyName.Contains(custName)) &&
-                (employee.Equals("00") ? true : x.Employees.LastName.Equals(employee)) &&
-                (ship.Equals("00") ? true : x.Shippers.CompanyName.Equals(ship)) &&
-                (String.IsNullOrEmpty(orderDate) ? true : x.OrderDate == orderD) &&
-                (String.IsNullOrEmpty(shipDate) ? true : x.ShippedDate == shipD) &&
-                (String.IsNullOrEmpty(needDate) ? true : x.RequiredDate == needD)
+            List<Orders> orderdata = db.Orders.ToList();
 
-                ).ToList();
-
-            ViewBag.orderdata = orderdata;
-
-            return View();
+            return orderdata;
         }
+
+        //public ActionResult search(String orderId, String custName, String employee,
+        //    String ship, String orderDate, String shipDate, String needDate)
+        //{
+
+        //    DateTime orderD = Convert.ToDateTime(orderDate);
+        //    DateTime shipD = Convert.ToDateTime(shipDate);
+        //    DateTime needD = Convert.ToDateTime(needDate);
+
+        //    List<Orders> orderdata = db.Orders.Where(x =>
+        //        (String.IsNullOrEmpty(orderId) ? true : x.OrderID.ToString() == orderId) &&
+        //        (String.IsNullOrEmpty(custName) ? true : x.Customers.CompanyName.Contains(custName)) &&
+        //        (employee.Equals("00") ? true : x.Employees.LastName.Equals(employee)) &&
+        //        (ship.Equals("00") ? true : x.Shippers.CompanyName.Equals(ship)) &&
+        //        (String.IsNullOrEmpty(orderDate) ? true : x.OrderDate == orderD) &&
+        //        (String.IsNullOrEmpty(shipDate) ? true : x.ShippedDate == shipD) &&
+        //        (String.IsNullOrEmpty(needDate) ? true : x.RequiredDate == needD)
+
+        //        ).ToList();
+
+        //    ViewBag.orderdata = orderdata;
+
+        //    return View();
+        //}
 
 
         public ActionResult update(String orderId)
