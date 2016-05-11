@@ -43,56 +43,27 @@ namespace WorkShop.Controllers
         //    return RedirectToAction("search", new { orderId, custName, employee, ship, orderDate, shipDate, needDate });
         //}
 
-        [HttpPost]
-        public JsonResult Index(int orderId)
+        [HttpGet]
+        public JsonResult DataSource(String orderId,String custName, String employee,
+            String ship, DateTime orderDate, DateTime shipDate, DateTime needDate)
         {
+            //DateTime orderD = Convert.ToDateTime(orderDate);
+            //DateTime shipD = Convert.ToDateTime(shipDate);
+            //DateTime needD = Convert.ToDateTime(needDate);
 
-            //List<Orders> data = result(orderId.ToString(), null, null, null, null, null, null);
-
-            //foreach (var item in data)
-            //{
-                
-            //}
-
-            Orders data = db.Orders.Find(orderId);
-
-            String id = data.OrderID.ToString();
-            String name = data.Customers.CompanyName;
-            String orderDate = data.OrderDate.ToString();
-            String shipDate = data.ShippedDate.ToString();
-
-            var obj = new { id = id, 
-                name = name, 
-                orderDate = orderDate, 
-                shipDate = shipDate 
-            };
-
-            return Json(obj);
-        }
-
-        public List<Orders> result(String orderId, String custName, String employee,
-            String ship, String orderDate, String shipDate, String needDate)
-        {
-            DateTime orderD = Convert.ToDateTime(orderDate);
-            DateTime shipD = Convert.ToDateTime(shipDate);
-            DateTime needD = Convert.ToDateTime(needDate);
-
-            List<Orders> orderdata = db.Orders.Where(x =>
+            var orderdata = db.Orders.Where(x =>
                 (String.IsNullOrEmpty(orderId) ? true : x.OrderID.ToString() == orderId) &&
                 (String.IsNullOrEmpty(custName) ? true : x.Customers.CompanyName.Contains(custName)) &&
                 (employee.Equals("00") ? true : x.Employees.LastName.Equals(employee)) &&
                 (ship.Equals("00") ? true : x.Shippers.CompanyName.Equals(ship)) &&
-                (String.IsNullOrEmpty(orderDate) ? true : x.OrderDate == orderD) &&
-                (String.IsNullOrEmpty(shipDate) ? true : x.ShippedDate == shipD) &&
-                (String.IsNullOrEmpty(needDate) ? true : x.RequiredDate == needD)
+                (String.IsNullOrEmpty(orderDate.ToString()) ? true : x.OrderDate == orderDate) &&
+                (String.IsNullOrEmpty(shipDate.ToString()) ? true : x.ShippedDate == shipDate) &&
+                (String.IsNullOrEmpty(needDate.ToString()) ? true : x.RequiredDate == needDate)
+            )
+            .Select(x => new { x.OrderID, x.Customers.CompanyName, x.OrderDate, x.ShippedDate })
+            .ToList();
 
-            ).ToList();
-
-            List<Orders> data = db.Orders.ToList();
-
-            
-
-            return data;
+            return Json(orderdata);
         }
 
         //public ActionResult search(String orderId, String custName, String employee,

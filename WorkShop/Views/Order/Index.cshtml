@@ -20,7 +20,7 @@
         <tr>
             <td>負責員工</td>
             <td colspan="3">
-                <select name="employee" class="dropdown">
+                <select name="employee" class="dropdown" id="employee">
                     <option value="00">請選擇負責員工</option>
                     @if (ViewBag.emName != null)
                     {
@@ -36,7 +36,7 @@
         <tr>
             <td>出貨公司</td>
             <td colspan="3">
-                <select name="ship" class="dropdown">
+                <select name="ship" class="dropdown" id="ship">
                     <option value="00">請選擇出貨公司</option>
                     @if (ViewBag.coName != null)
                     {
@@ -50,15 +50,15 @@
         </tr>
         <tr>
             <td>訂購日期</td>
-            <td><input type="date" class="date" name="orderDate" /></td>
+            <td><input type="date" id="orderDate" class="date" name="orderDate" /></td>
 
             <td>出貨日期</td>
-            <td><input type="date" class="date" name="shipDate" /></td>
+            <td><input type="date" id="shipDate" class="date" name="shipDate" /></td>
 
         </tr>
         <tr>
             <td>需要日期</td>
-            <td colspan="3"><input type="date" class="date" name="needDate" /></td>
+            <td colspan="3"><input type="date" id="needDate" class="date" name="needDate" /></td>
         </tr>
         <tr>
             <td></td>
@@ -69,14 +69,8 @@
             </td>
         </tr>
     </table>
-
-    <div id="result"></div>
-</body>
-
-</html>
-
-<script>
-    $(document).ready(function () {
+    <script>
+    $(function () {
 
         $(".text").kendoMaskedTextBox();
         $("#orderid").kendoNumericTextBox({
@@ -101,91 +95,102 @@
             }
         });
         $(".btn").kendoButton();
-    })
 
+
+    });
+
+       
     function search() {
+        console.log("test");
 
-        var id =  $("#orderid").val();
-
-        var dataSrc = $.ajax({
-            type: 'POST',
-            url: '/Order/Index',
-            dataType: 'json',
-            data: { orderId: id },
-        })
-        @*var dataSrc = new kendo.data.DataSource({
+        var dataSrc = new kendo.data.DataSource({
             transport: {
                 read: {
-                    以下其實就是$.ajax的參數
-                    type: "POST",
-                    url: "@Url.Action("/Index")",
+                    type: "GET",
+                    url: '@Url.Action("DataSource", "Order")',
                     dataType: "json",
-                    contentType: "application/json; charset=utf-8",
                     data: {
-                        額外傳至後方的參數
-                        orderId:id,
-
-
+                        orderId: function(){
+                            return $("#orderid").val();
+                        },
+                        custName: function () {
+                            return $("#custName").val();
+                        },
+                        employee: function () {
+                            return $("#employee").val();
+                        },
+                        ship: function () {
+                            return $("#ship").val();
+                        },
+                        orderDate: function () {
+                            return $("#orderDate").val();
+                        },
+                        shipDate: function () {
+                            return $("#shipDate").val();
+                        },
+                        needDate: function () {
+                            return $("#needDate").val();
+                        }
                     }
                 }
             },
             schema: {
                 model: {
-                    fields: {
-                        orderId: { type: "int" },
-                    }
-                },
-                取出資料陣列
-                data: function (d) { return d.Data; },
-                取出資料總筆數(計算頁數用)
-                total: function (d) { return d.TotalCount; }
+
+                    id: "OrderID",
+                    fields:
+                        {
+                            OrderID: { editable: false, nullable: false },
+                            CompanyName: { editable: false, nullable: false },
+                            OrderdDate: { editable: true, nullable: false },
+                            ShippedDate: { editable: true, nullable: false },
+                        }
+                }
             },
             pageSize: 10,
             serverPaging: true,
             serverSorting: true
-        });*@
+        });
 
+
+        console.log(dataSrc);
         $("#dvGrid").kendoGrid({
             dataSource: dataSrc,
             columns: [
                 {
                     field: "orderId", title: "訂單編號",
+                    template: "#=OrderID#"
                 },
                 {
                     field: "custName", title: "客戶名稱",
+                    template: "#=CompanyName#"
                 },
                 {
                     field: "orderDate", title: "訂購日期",
+                    template: "#= kendo.toString(Date(OrderdDate), 'yyyy/MM/dd') #"
                 },
                 {
                     field: "shipDate", title: "發貨日期",
+                    template: "#= kendo.toString(Date(ShippedDate), 'yyyy/MM/dd') #"
                 }
             ],
             sortable: true,
-            pageable: true,
-            dataBound: function () {
-
-                document.location.href = "/Order/search";
-
-                ////AJAX資料Bind完成後觸發
-                //var kw = $("#tKeyword").val();
-                ////若有設關鍵字，做Highlight處理
-                //if (kw.length > 0) {
-                //    var re = new RegExp(kw, "g");
-                //    $(".u-name").each(function () {
-                //        var $td = $(this);
-                //        $td.html($td.text()
-                //       .replace(re, "<span class='hi-lite'>$&</span>"));
-                //    });
-                //}
+            pageable: {
+                refresh: true,
+                pageSizes: true,
+                buttonCount: 5
             },
-            dataBinding: function (e) {
-                console.log(e);
-            }
         });
     }
 
-    
-</script>
+
+    </script>
+
+    <div id="dvGrid"></div>
+</body>
+
+</html>
+
+
 
 
