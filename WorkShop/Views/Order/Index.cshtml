@@ -8,67 +8,71 @@
 <html>
 
 <body>
-    <table id="searchTable" border="1" style="width:100%" border-collapse="collapse" class="table table-bordered">
-        <tr>
-            <td>訂單編號</td>
-            <td colspan="3"><input type="text" id="orderid" name="orderId" placeholder="請輸入訂單編號"></td>
-        </tr>
-        <tr>
-            <td>客戶名稱</td>
-            <td colspan="3"><input type="text" id="custName" class="text" name="custName" placeholder="請輸入客戶姓名"/></td>
-        </tr>
-        <tr>
-            <td>負責員工</td>
-            <td colspan="3">
-                <select name="employee" class="dropdown" id="employee">
-                    <option value="00">請選擇負責員工</option>
-                    @if (ViewBag.emName != null)
-                    {
-                        foreach (var tmp in (List<String>)ViewBag.emName)
+    @using (Html.BeginForm("Index","Order",FormMethod.Post))
+    {
+        <table id="searchTable" border="1" style="width:100%" border-collapse="collapse" class="table table-bordered">
+            <tr>
+                <td>訂單編號</td>
+                <td colspan="3"><input type="text" id="orderid" name="orderId" placeholder="請輸入訂單編號"></td>
+            </tr>
+            <tr>
+                <td>客戶名稱</td>
+                <td colspan="3"><input type="text" id="custName" class="text" name="custName" placeholder="請輸入客戶姓名" /></td>
+            </tr>
+            <tr>
+                <td>負責員工</td>
+                <td colspan="3">
+                    <select name="employee" class="dropdown" id="employee">
+                        <option value="00">請選擇負責員工</option>
+                        @if (ViewBag.emName != null)
                         {
-                            <option>@tmp</option>
+                            foreach (var tmp in (List<String>)ViewBag.emName)
+                            {
+                                <option>@tmp</option>
+                            }
                         }
-                    }
 
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <td>出貨公司</td>
-            <td colspan="3">
-                <select name="ship" class="dropdown" id="ship">
-                    <option value="00">請選擇出貨公司</option>
-                    @if (ViewBag.coName != null)
-                    {
-                        foreach (var tmp in (List<String>)ViewBag.coName)
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>出貨公司</td>
+                <td colspan="3">
+                    <select name="ship" class="dropdown" id="ship">
+                        <option value="00">請選擇出貨公司</option>
+                        @if (ViewBag.coName != null)
                         {
-                            <option>@tmp</option>
+                            foreach (var tmp in (List<String>)ViewBag.coName)
+                            {
+                                <option>@tmp</option>
+                            }
                         }
-                    }
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <td>訂購日期</td>
-            <td><input type="date" id="orderDate" class="date" name="orderDate" /></td>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>訂購日期</td>
+                <td><input type="date" id="orderDate" class="date" name="orderDate" /></td>
 
-            <td>出貨日期</td>
-            <td><input type="date" id="shipDate" class="date" name="shipDate" /></td>
+                <td>出貨日期</td>
+                <td><input type="date" id="shipDate" class="date" name="shipDate" /></td>
 
-        </tr>
-        <tr>
-            <td>需要日期</td>
-            <td colspan="3"><input type="date" id="needDate" class="date" name="needDate" /></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td colspan="3">
-                <input type="submit" value="查詢" class="btn btn-info" onclick="search()" />
-                <input type="reset" value="清除" class="btn btn-warning" />
-                <a href="/Order/Insert"><input type="button" value="新增訂單" class="btn btn-primary" /></a>
-            </td>
-        </tr>
-    </table>
+            </tr>
+            <tr>
+                <td>需要日期</td>
+                <td colspan="3"><input type="date" id="needDate" class="date" name="needDate" /></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td colspan="3">
+                    <input type="submit" value="查詢" class="btn btn-info" onclick="search()" />
+                    <input type="reset" value="清除" class="btn btn-warning" />
+                    <a href="/Order/Insert"><input type="button" value="新增訂單" class="btn btn-primary" /></a>
+                </td>
+            </tr>
+        </table>
+    }
+    
     <script>
     $(function () {
 
@@ -100,8 +104,7 @@
     });
 
        
-    function search() {
-        console.log("test");
+    @*function search() {
 
         var dataSrc = new kendo.data.DataSource({
             transport: {
@@ -113,24 +116,24 @@
                         orderId: function(){
                             return $("#orderid").val();
                         },
-                        custName: function () {
-                            return $("#custName").val();
-                        },
-                        employee: function () {
-                            return $("#employee").val();
-                        },
-                        ship: function () {
-                            return $("#ship").val();
-                        },
-                        orderDate: function () {
-                            return $("#orderDate").val();
-                        },
-                        shipDate: function () {
-                            return $("#shipDate").val();
-                        },
-                        needDate: function () {
-                            return $("#needDate").val();
-                        }
+                        //custName: function () {
+                        //    return $("#custName").val();
+                        //},
+                        //employee: function () {
+                        //    return $("#employee").val();
+                        //},
+                        //ship: function () {
+                        //    return $("#ship").val();
+                        //},
+                        //orderDate: function () {
+                        //    return $("#orderDate").val();
+                        //},
+                        //shipDate: function () {
+                        //    return $("#shipDate").val();
+                        //},
+                        //needDate: function () {
+                        //    return $("#needDate").val();
+                        //}
                     }
                 }
             },
@@ -148,8 +151,6 @@
                 }
             },
             pageSize: 10,
-            serverPaging: true,
-            serverSorting: true
         });
 
 
@@ -158,19 +159,17 @@
             dataSource: dataSrc,
             columns: [
                 {
-                    field: "orderId", title: "訂單編號",
-                    template: "#=OrderID#"
+                    field: "OrderID", title: "訂單編號",
                 },
                 {
-                    field: "custName", title: "客戶名稱",
-                    template: "#=CompanyName#"
+                    field: "CompanyName", title: "客戶名稱",
                 },
                 {
-                    field: "orderDate", title: "訂購日期",
-                    template: "#= kendo.toString(Date(OrderdDate), 'yyyy/MM/dd') #"
+                    field: "OrderdDate", title: "訂購日期",
+                    template: "#= kendo.toString(kendo.parseDate(OrderdDate, 'yyyy/MM/dd'),'yyyy-MM-dd') #"
                 },
                 {
-                    field: "shipDate", title: "發貨日期",
+                    field: "ShippedDate", title: "發貨日期",
                     template: "#= kendo.toString(Date(ShippedDate), 'yyyy/MM/dd') #"
                 }
             ],
@@ -181,7 +180,7 @@
                 buttonCount: 5
             },
         });
-    }
+    }*@
 
 
     </script>

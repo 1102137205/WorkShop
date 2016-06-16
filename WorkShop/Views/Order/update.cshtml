@@ -159,16 +159,16 @@
 
             //qtytext
             @:var qty = document.createElement("td");
-                            @:qty.innerHTML = "<input type='text' class='num' id='qty"+count+"' name='qty["+count+"]' value='@item.Qty' oninput='changeSubtotal("+count+")' onchange='changeSubtotal("+count+")' style='direction:rtl'/>";
+                            @:qty.innerHTML = "<input type='text' class='qty' id='qty"+count+"' name='qty["+count+"]' value='@item.Qty' oninput='changeSubtotal("+count+")' onchange='changeSubtotal("+count+")' style='text-align:right'/>";
 
             //subtotaltext
             @:var sum = @item.UnitPrice * @item.Qty;
                             @:var subtotal = document.createElement("td");
-                            @:subtotal.innerHTML = "<input type='text' class='text' id='subtotal" + count + "' name='subtotal' value='"+sum+"' onchange='changeTotal()' style='direction:rtl' disabled />";
+                            @:subtotal.innerHTML = "<input type='text' class='num' id='subtotal" + count + "' name='subtotal' value='"+sum+"' onchange='changeTotal()' style='text-align:right' disabled />";
 
             //cancelbutton
             @:var cancle = document.createElement("td");
-            @:cancle.innerHTML = "<input type='button' id ='" + count + "' class='btn btn-primary' onclick='delRow(" + count + ")' value='刪除'/>";
+            @:cancle.innerHTML = "<input type='button' id ='" + count + "' class='btn btn-primary' onclick='delRow(" + count + ","+@item.ProductID+")' value='刪除'/>";
 
             @:tr.appendChild(product);
                             @:tr.appendChild(price);
@@ -178,7 +178,9 @@
                             @:tableObjs.appendChild(tr);
                         }
 
-        $(".text").kendoMaskedTextBox();
+        $(".text").kendoMaskedTextBox({
+            format:"#"
+        });
         $("#addressNo").kendoMaskedTextBox();
         $("#orderid").kendoNumericTextBox({
             format: "#",
@@ -188,6 +190,10 @@
             format:"c2",
             min: 1,
         });
+        $(".qty").kendoNumericTextBox({
+            min: 1,
+        });
+
         $(".dropdown").kendoComboBox({
             filter: "contains",
             suggest: true,
@@ -213,6 +219,7 @@
 
 
     function selectProduct(tr) {
+
         var product = document.createElement("td");
         var select = document.createElement("select");
 
@@ -230,19 +237,20 @@
 
         product.appendChild(select);
         tr.appendChild(product);
+       
     }
 
     function priceText(tr) {
         var price = document.createElement("td");
         price.setAttribute("id", price);
-        price.innerHTML = "<input type='text' id ='price" + count + "' class='num' name='price["+count+"]' value='0' oninput='changeSubtotal("+count+")' onchange='changeSubtotal("+count+")' style='direction:rtl' />";
+        price.innerHTML = "<input type='text' id ='price" + count + "' class='num' name='price["+count+"]' value='0' oninput='changeSubtotal("+count+")' onchange='changeSubtotal("+count+")' style='text-align:right' />";
 
         tr.appendChild(price);
     }
 
     function qtyText(tr) {
         var qty = document.createElement("td");
-        qty.innerHTML = "<input type='text' id ='qty" + count + "' class='num' name='qty["+count+"]' value='1' oninput='changeSubtotal("+count+")' onchange='changeSubtotal("+count+")' style='direction:rtl' />";
+        qty.innerHTML = "<input type='text' id ='qty" + count + "' class='qty' name='qty["+count+"]' value='1' oninput='changeSubtotal("+count+")' onchange='changeSubtotal("+count+")' style='text-align:right' />";
 
         tr.appendChild(qty);
     }
@@ -277,14 +285,53 @@
         changeTotal();
 
         tableObjs.appendChild(tr);
+
+        
+        for (var i = 1; i <= count; i++) {
+            $("#product"+i).kendoComboBox({
+                filter: "contains",
+                suggest: true,
+            });
+
+            $("#price"+i).kendoNumericTextBox({
+                format:"c2",
+                min: 1,
+            });
+
+            $("#qty"+i).kendoNumericTextBox({
+                min: 1,
+            });
+
+            $("#subtotal"+i).kendoNumericTextBox({
+                format:"c2",
+                min:1
+            })
+            $("#"+i).kendoButton();
+        }
+        
     }
 
-    function delRow(num) {
-        var orderDetailTable = document.getElementById("orderDetailTable");
+    function delRow(num,productId) {
 
+        var orderDetailTable = document.getElementById("orderDetailTable");
         orderDetailTable.deleteRow(num);
         count--;
         changeTotal();
+
+        $.ajax({
+            type: "GET",
+            url: "/Order/deleteDetail",
+            data: {
+                productId:productId
+            },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (msg) {
+                console.log(msg);
+            }
+        });
+
+        
     }
 
     //選擇商品改變單價改變小計
@@ -306,9 +353,7 @@
     function changePrice(productId, selectId) {
 
         var id = selectId.substring(7);
-        var price = document.getElementById("price"+id);
         var qty = document.getElementById("qty"+id);
-        var subtotal = document.getElementById("subtotal"+id);
 
         $.ajax({
             type: "GET",
@@ -319,8 +364,8 @@
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function (msg) {
-                price.value = msg;
-                subtotal.value = Math.round(msg * qty.value);
+                $("#price"+id).data("kendoNumericTextBox").value(msg);
+                $("#subtotal"+id).data("kendoNumericTextBox").value(msg * qty.value);
             }
         });
 
@@ -329,11 +374,11 @@
 
     //修改單價或數量改變小計
     function changeSubtotal(idCount){
-        var qty = document.getElementById("qty"+idCount);
-        var price = document.getElementById("price"+idCount);
-        var subtotal = document.getElementById("subtotal"+idCount);
+        var qty = $("#qty"+idCount).data("kendoNumericTextBox").value();
+        var price = $("#price"+idCount).data("kendoNumericTextBox").value();
 
-        subtotal.value = Math.round(qty.value * price.value);
+        $("#subtotal"+idCount).data("kendoNumericTextBox").value(qty * price);
+
         changeTotal();
     }
 
